@@ -1,19 +1,19 @@
-import { useState } from 'react'
-import './App.css'
 
-import Login from './pages/login'
+import { BrowserRouter as Router } from "react-router-dom"
 
-function App() {
+import GlobalRoutes from "./routes/GlobalRoutes"
+
+const App = () => {
 
   return (
-    <>
+    
 
-    <Login>
+    <Router>
 
-      
-    </Login>
+      <GlobalRoutes/>
 
-    </>
+    </Router>
+
   )
 }
 

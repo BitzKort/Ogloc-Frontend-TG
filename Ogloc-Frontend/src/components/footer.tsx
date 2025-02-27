@@ -13,7 +13,7 @@ const Footer : React.FC = () => {
             <img src={logo} className="w-32 h-auto"></img>
 
             <div className="mr-10">
-                <h2> tulua, valle del cauca</h2>
+                <h2> Tulua, valle del cauca</h2>
                 <h2> miguel.angel.rivera@correounivalle.edu.co</h2>
             </div>
 
