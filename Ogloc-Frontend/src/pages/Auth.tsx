@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {motion} from "framer-motion";
 import MainLayout from "../layout/mainLayout";
 import Login from "./login";
@@ -9,11 +9,25 @@ const Auth = () => {
 
     const [isFlipped, setIsFlipped] = useState(false);
 
+    const [valuesLogin, setValuesLogin] = useState({ email: "", password: "" });
+
+    const [valuesRegister, setValuesRegister] = useState({name: "", username: "", email: "", password: ""});
+
     const toggleForm = () => {
         setIsFlipped(!isFlipped);
 
     }
 
+    useEffect (() => {
+
+        setValuesLogin({email:"", password:""})
+    }, [isFlipped]);
+
+
+    useEffect (() => {
+
+        setValuesRegister({name: "", username: "", email: "", password: ""})
+    }, [isFlipped]);
 
     return (
 
@@ -28,12 +42,12 @@ const Auth = () => {
                             style={{ transformStyle: "preserve-3d" }}
                         >
                             <div className={` backface-hidden ${isFlipped ? "hidden" : ""}`}>
-                                <Login toggleForm={toggleForm} />
+                                <Login toggleForm={toggleForm} valuesLogin = {valuesLogin} setValuesLogin = {setValuesLogin} />
                             </div>
 
     
                             <div className={` backface-hidden ${isFlipped ? "" : "hidden"} rotate-y-180`}>
-                                <Register toggleForm={toggleForm} />
+                                <Register toggleForm={toggleForm} valuesRegister = {valuesRegister} setValuesRegister = {setValuesRegister} />
                             </div>
                         </motion.div>
             </div>

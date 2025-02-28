@@ -1,13 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import fondo from "../assets/background login.webp"
-import { Link } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
 interface LoginProps {
-
-    
-
     toggleForm: () => void;
+    valuesLogin: { email: string; password: string }; 
+    setValuesLogin: (values: { email: string; password: string }) => void
 }
 
 interface loginDataProps {
@@ -19,7 +17,7 @@ interface loginDataProps {
 
  
 
-const Login: React.FC<LoginProps> = ({toggleForm}) => {
+const Login: React.FC<LoginProps> = ({toggleForm, valuesLogin, setValuesLogin}) => {
 
     const [userData, setUserData] = useState<loginDataProps>({
 
@@ -27,11 +25,14 @@ const Login: React.FC<LoginProps> = ({toggleForm}) => {
         password:"",
         })
     
+    
     const [error, setError] = useState<string | null >(null);
 
     const catchUserData = (e: React.ChangeEvent<HTMLInputElement>) =>{
 
         setUserData({ ...userData, [e.target.name]: e.target.value });
+
+        setValuesLogin({...valuesLogin, [e.target.name]: e.target.value});
 
     }
     
@@ -46,7 +47,17 @@ const Login: React.FC<LoginProps> = ({toggleForm}) => {
         
           else {
 
-            console.log(userData)
+            try{
+
+                const response = await axios.post("http://localhost:8000/login", userData);
+                console.log(response);
+            } catch (err) {
+
+                setError("algo paso")   
+                console.log(error)
+            }
+
+
           }
 
 
@@ -64,11 +75,11 @@ const Login: React.FC<LoginProps> = ({toggleForm}) => {
                         
                     </div>
 
-                    <input onChange={catchUserData} name="email" placeholder= "Email" className="bg-[#1C212B] text-white text-md w-80 py-3 px-6 rounded-md " required>
+                    <input onChange={catchUserData} name="email" value={valuesLogin.email} placeholder= "Email" className="bg-[#1C212B] text-white text-md w-80 py-3 px-6 rounded-md " required>
 
                     </input>
 
-                    <input onChange={catchUserData} name="password" type= "password" placeholder="Password" className="bg-[#1C212B] text-white text-md w-80 py-3 px-6 rounded-md " required>
+                    <input onChange={catchUserData} name="password" value={valuesLogin.password} type= "password" placeholder="Password" className="bg-[#1C212B] text-white text-md w-80 py-3 px-6 rounded-md " required>
                     
                     </input>
 
