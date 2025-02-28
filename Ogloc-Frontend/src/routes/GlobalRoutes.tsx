@@ -1,13 +1,13 @@
 import { Routes, Route } from "react-router-dom";
 
-import Prueba from "../pages/prueba";
+import Auth from "../pages/Auth";
 const GlobalRoutes = () => {
 
     return (
            
           <Routes>
     
-            <Route path="/" element={<Prueba/>}/>
+            <Route path="/" element={<Auth/>}/>
     
           </Routes>
 

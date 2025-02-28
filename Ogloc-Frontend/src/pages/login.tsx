@@ -1,18 +1,60 @@
 import React from "react";
 import fondo from "../assets/background login.webp"
 import { Link } from "react-router-dom";
-
-
+import { useState } from "react";
+import axios from "axios";
 interface LoginProps {
+
+    
 
     toggleForm: () => void;
 }
 
+interface loginDataProps {
+
+    email: string;
+    password: string;
+}
+
+
+ 
+
 const Login: React.FC<LoginProps> = ({toggleForm}) => {
+
+    const [userData, setUserData] = useState<loginDataProps>({
+
+        email: "",
+        password:"",
+        })
+    
+    const [error, setError] = useState<string | null >(null);
+
+    const catchUserData = (e: React.ChangeEvent<HTMLInputElement>) =>{
+
+        setUserData({ ...userData, [e.target.name]: e.target.value });
+
+    }
+    
+    const submitData = async (e: React.FormEvent) => {
+
+        e.preventDefault();
+
+        if (!userData.email || !userData.password) {
+            alert("Todos los campos son obligatorios");
+            return;
+          }
+        
+          else {
+
+            console.log(userData)
+          }
+
+
+    }
 
     return (
 
-            <div className="flex flex-col justify-center items-center bg-white rounded-2xl w-md h-md">
+            <div className="flex flex-col justify-center items-center bg-white rounded-2xl w-md h-md shadow-sm shadow-gray-500 rounded-2xl">
 
                 <img src = {fondo} className=" w-full h-full object-cover rounded-2xl"/>
 
@@ -22,17 +64,17 @@ const Login: React.FC<LoginProps> = ({toggleForm}) => {
                         
                     </div>
 
-                    <input placeholder= "Email" className="bg-[#1C212B] text-white text-md w-80 py-3 px-6 rounded-md ">
+                    <input onChange={catchUserData} name="email" placeholder= "Email" className="bg-[#1C212B] text-white text-md w-80 py-3 px-6 rounded-md " required>
 
                     </input>
 
-                    <input type= "password" placeholder="Password" className="bg-[#1C212B] text-white text-md w-80 py-3 px-6 rounded-md ">
+                    <input onChange={catchUserData} name="password" type= "password" placeholder="Password" className="bg-[#1C212B] text-white text-md w-80 py-3 px-6 rounded-md " required>
                     
                     </input>
 
                     <div className="w-full flex justify-end px-5">
 
-                    <button onClick={toggleForm} className="bg-[#457884] hover:bg-[#3E6973] text-white text-md py-2 px-7 rounded"> Ingresar </button>
+                    <button type="submit" onClick={submitData} className="bg-[#457884] hover:bg-[#3E6973] text-white text-md py-2 px-7 rounded"> Ingresar </button>
 
                     </div>
 
@@ -43,7 +85,7 @@ const Login: React.FC<LoginProps> = ({toggleForm}) => {
 
                         <p> No tienes cuenta? 
                             
-                            <Link to="/register" className=" text-[#61DECA] hover:text-[#457884]"> Registrate.</Link>
+                            <a  onClick={toggleForm} className=" text-[#61DECA] hover:text-[#457884]"> Registrate.</a>
 
 
                         </p>
