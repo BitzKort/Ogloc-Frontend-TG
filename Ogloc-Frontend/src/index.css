@@ -3,3 +3,14 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+
+.custom-scroll::-webkit-scrollbar {
+    display: none; /* Oculta la barra de scroll en Chrome, Safari y Edge */
+  }
+  
+  .custom-scroll {
+    -ms-overflow-style: none; /* Oculta la barra en Internet Explorer y Edge */
+    scrollbar-width: none; /* Oculta la barra en Firefox */
+  }

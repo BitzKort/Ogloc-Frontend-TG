@@ -9,7 +9,7 @@ const NavBar: React.FC = () => {
 
         <div className="flex felx-row gap-3 min-w-full justify-between items-center border ">
 
-            <img className ="w-20 h-20 object-contain border"src={Logo}></img>
+            <img className ="w-20 h-20 object-contain"src={Logo}></img>
 
             <button> Inicio</button>
             <button> Entrena </button>

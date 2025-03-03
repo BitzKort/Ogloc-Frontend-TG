@@ -14,11 +14,11 @@ const MainLayout: React.FC<MainLayoutProps> = ({children, navBar}) => {
 
     return (
 
-        <div className="flex flex-col min-h-screen bg-cover bg-center " style={{ backgroundImage: `url(${fondo})` }}>
+        <div className="flex flex-col min-h-screen bg-cover bg-center" style={{ backgroundImage: `url(${fondo})` }}>
         
         {navBar && <NavBar/>}
 
-        <main className="flex-grow flex justify-center items-center m-2 sm:m-4 md:m-8 lg:m-12 xl:m-16">
+        <main className="flex-grow flex justify-center m-2 sm:m-3 md:m-7 lg:m-11 xl:m-15">
 
             {children}
 
