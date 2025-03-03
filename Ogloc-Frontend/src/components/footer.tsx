@@ -9,7 +9,7 @@ const Footer : React.FC = () => {
 
         <div className=" h-25 flex items-center justify-between">
         
-            <h1 className="ml-10 text-2xl"> English with Ogloc</h1>
+            <h1 className="ml-10 text-2xl whitespace-normal"> English <br /> &emsp;  with Ogloc</h1>
             <img src={logo} className="w-32 h-auto"></img>
 
             <div className="mr-10">

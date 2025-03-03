@@ -4,8 +4,13 @@ import MainLayout from "../layout/mainLayout";
 import Login from "./login";
 import Register from "./register";
 
+interface AuthProps {
 
-const Auth = () => {
+    showNavBar: boolean;
+}
+
+
+const Auth: React.FC<AuthProps> = ({showNavBar}) => {
 
     const [isFlipped, setIsFlipped] = useState(false);
 
@@ -31,7 +36,7 @@ const Auth = () => {
 
     return (
 
-        <MainLayout>
+        <MainLayout navBar = {showNavBar}>
 
             <div >
                         <motion.div

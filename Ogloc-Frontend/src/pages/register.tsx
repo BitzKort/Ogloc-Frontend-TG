@@ -92,7 +92,7 @@ const Register: React.FC<RegisterProps> = ({toggleForm, valuesRegister, setValue
 
             <div className="flex flex-col items-center justify-center w-full h-full py-70 px-10 bg-[#457884] rounded-2xl shadow-sm shadow-gray-500">
 
-                <img src={avatar} className="w-32 h-auto"></img>
+                <img src={avatar} className="w-32 h-auto "></img>
                 <h1 className="text-2xl text-center max-w-xs"> Crea tu cuenta y comienza a ganar XP</h1>
                 
 

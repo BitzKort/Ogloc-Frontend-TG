@@ -1,15 +1,29 @@
 import React from "react";
+import MainLayout from "../layout/mainLayout";
 
 
+interface HomeProps {
 
-const Home: React.FC = ()=>{
+    showNavBar: boolean;
+
+}
+
+const Home: React.FC<HomeProps> = ({showNavBar})=>{
 
 
     return (
 
-        <div className="flex items-center justify-center">
-            <h1>Estas en Home</h1>
-        </div>
+
+        <MainLayout navBar = {showNavBar} >
+
+            <div className="flex items-center justify-center">
+               <h1>Estas en Home</h1>
+            </div>
+
+        </MainLayout>
+
+
+        
     )
 }
 
