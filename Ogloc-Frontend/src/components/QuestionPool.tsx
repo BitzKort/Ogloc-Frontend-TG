@@ -2,13 +2,18 @@ import React from "react";
 
 import Logo from "../assets/Ogloc logo 2.png"
 
+import { useNavigate } from "react-router-dom";
+
 const QuestionPool: React.FC = () => {
 
+    const navigate = useNavigate();
+
     return (
-        <div className="flex flex-col items-center justify-center border mx-50 sm:mx-40 md:mx-50 lg:mx-50 xl:mx-50">
+        <div className="flex flex-col items-center justify-center bg-[#61DECA]/60 w-310 py-8 rounded-lg" onClick={() => {navigate("/question")}}>
 
             <img className="w-30 h-30 object-contain" src = {Logo}></img>
-            <h1 className="ml-10 text-2xl whitespace-normal items-center justify-center"> Gana experiencia resolviendo <br />  las preguntas que has fallado en los módulos </h1>
+            <h1 className="text-2xl whitespace-normal"> Gana experiencia resolviendo </h1>
+            <h1 className="text-2xl whitespace-normal"> las preguntas que has fallado en los módulos </h1>
 
         </div>
 

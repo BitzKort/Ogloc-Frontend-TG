@@ -1,17 +1,38 @@
-import React from "react";
 import Ogloc from "../assets/Ogloc logo 2.png"
 import GandalfVerde from "../assets/rana-Ogloc.svg"
 import Gustavf from "../assets/zorro ogloc.png"
+import { motion } from "framer-motion"; 
+import { useNavigate } from "react-router-dom";
+
 const AvatarStoreCard: React.FC = () => {
+
+    const images = [
+
+        Ogloc,
+        GandalfVerde,
+        Gustavf
+    ]
+
+    const navigate = useNavigate();
 
     return (
 
-        <div className="flex flex-col gap-2 border items-center justify-center mx-50 sm:mx-40 md:mx-50 lg:mx-50 xl:mx-50">
+        <div className="flex flex-col gap-2 bg-[#61DECA]/60 items-center justify-center  w-310 py-8 rounded-lg" onClick={() => {navigate("/store")}}>
 
-            <div className="flex flex-row gap -3  items-center">
-                <img className="object-contain w-30 h-30 " src={Ogloc}></img>
-                <img className="object-contain w-30 h-30 " src={GandalfVerde}></img>
-                <img className="object-contain w-30 h-30 " src={Gustavf}></img>
+            <div className="flex flex-row gap-5  justify-center items-center">
+
+
+            {images.map((src, index) => (
+                <motion.img
+                key={index}
+                src={src}
+                alt={`img-${index}`}
+                className="w-32 h-32 object-contain rounded-4xl shadow-sm shadow-gray-600"
+                animate={{ rotateY: [0, 360] }} // Gira en bucle
+                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: index * 0.8 }}
+                />
+            ))}
+
                 
             </div>
 
