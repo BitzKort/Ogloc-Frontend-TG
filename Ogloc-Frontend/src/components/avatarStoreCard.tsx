@@ -17,7 +17,7 @@ const AvatarStoreCard: React.FC = () => {
 
     return (
 
-        <div className="flex flex-col gap-2 bg-[#61DECA]/60 items-center justify-center  w-310 py-8 rounded-lg" onClick={() => {navigate("/store")}}>
+        <div className="flex flex-col gap-2 bg-[#61DECA]/60 items-center justify-center  min-w-full py-8 sm:px-2 md:px-10 lg:px-80 rounded-lg" onClick={() => {navigate("/store")}}>
 
             <div className="flex flex-row gap-5  justify-center items-center">
 

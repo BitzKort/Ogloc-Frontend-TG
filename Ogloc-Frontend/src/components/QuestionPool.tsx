@@ -9,7 +9,7 @@ const QuestionPool: React.FC = () => {
     const navigate = useNavigate();
 
     return (
-        <div className="flex flex-col items-center justify-center bg-[#61DECA]/60 w-310 py-8 rounded-lg" onClick={() => {navigate("/question")}}>
+        <div className="flex flex-col items-center justify-center bg-[#61DECA]/60 min-w-full py-8 sm:px-15 md:px-30 lg:px-100 rounded-lg" onClick={() => {navigate("/question")}}>
 
             <img className="w-30 h-30 object-contain" src = {Logo}></img>
             <h1 className="text-2xl whitespace-normal"> Gana experiencia resolviendo </h1>

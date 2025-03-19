@@ -2,6 +2,7 @@ import React from "react";
 import avatar from "../assets/zorro ogloc.png"
 import { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 interface RegisterProps {
 
@@ -30,6 +31,8 @@ const Register: React.FC<RegisterProps> = ({toggleForm, valuesRegister, setValue
         password:  "",
 
     })
+
+    const navigate = useNavigate();
 
     const [conpass, setConPass] = useState("")
 
@@ -71,11 +74,14 @@ const Register: React.FC<RegisterProps> = ({toggleForm, valuesRegister, setValue
 
             try {
 
-                console.log(userData)
 
                 const response = await axios.post("http://localhost:8000/register", userData);
 
-                console.log(response)
+                if (response.status == 200) {
+
+                    algo();
+
+                }
 
             }catch(err) {
 

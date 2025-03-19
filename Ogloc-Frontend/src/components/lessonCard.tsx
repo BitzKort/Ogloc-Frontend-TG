@@ -2,13 +2,14 @@ import React from "react"
 import { useNavigate } from "react-router-dom";
 
 interface LessonCardProps {
-
+    
+    id:string;
     title:string;
-    QCount: number;
+    questions: number;
 
 }
 
-const LessonCard: React.FC<LessonCardProps> = ({title, QCount}) => {
+const LessonCard: React.FC<LessonCardProps> = ({id, title, questions}) => {
 
 
     const navigate = useNavigate();
@@ -16,11 +17,21 @@ const LessonCard: React.FC<LessonCardProps> = ({title, QCount}) => {
 
     return (
 
-        <div className=" flex flex-col bg-white/50 w-60 h-40 items-center justify-center flex-shrink-0 rounded-lg" onClick={() => {navigate("/question")}}>
+        <div className=" flex flex-col bg-white/50 w-60 h-40 items-center justify-between py-6 rounded-lg" onClick={() => {navigate(`/question/${id}`)}}>
 
-            <h1> {title} </h1>
-            <h2> {QCount} </h2>
+                <h1 className="font-semibold text-lg"> {title} </h1>
 
+                <div className="flex flex-row min-w-full pr-4 justify-end">
+
+                    <h2 className="italic"> 1/{questions} </h2>
+
+                </div>
+                
+
+
+
+
+            
         </div>
 
 

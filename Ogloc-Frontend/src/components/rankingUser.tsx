@@ -19,8 +19,6 @@ interface RankingUserProps {
 
 const RankingUser: React.FC<RankingUserProps> = ({index, player}) => {
 
-    console.log(index);
-    console.log(player);
 
     return (
 

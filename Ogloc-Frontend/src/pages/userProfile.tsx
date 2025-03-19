@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import MainLayout from "../layout/mainLayout";
 
 import AvatarMuestra from "../assets/rana-Ogloc.svg"
@@ -14,8 +14,15 @@ interface UserPorileProps {
 
 const UserProfile: React.FC<UserPorileProps> = ({showNavBar}) =>{
 
+    const storedUserInfo = localStorage.getItem("userInfo");
+    const userInfo = storedUserInfo ? JSON.parse(storedUserInfo) : null;
+
+
 
     return (
+
+
+       
 
         <MainLayout navBar ={showNavBar}>
 
@@ -28,8 +35,9 @@ const UserProfile: React.FC<UserPorileProps> = ({showNavBar}) =>{
             
                     <div className="flex flex-col text-lg text-white font-semibold justify-start">
 
-                        <span> Miguel Rivera</span>
-                        <span>@BitzKort</span>
+                        <span> {userInfo.name}</span>
+                        <span>@{userInfo.username}</span>
+                        <a className=""> Cambiar contraseña</a>
 
                     </div>
 
@@ -51,7 +59,7 @@ const UserProfile: React.FC<UserPorileProps> = ({showNavBar}) =>{
                     <div className="flex items-center gap-2 mb-4">
                     <Flame className="h-6 w-6 text-orange-500" />
                     <h2 className="text-xl font-semibold text-white">Racha</h2>
-                    <span className="text-5xl font-bold text-orange-500">14</span>
+                    <span className="text-5xl font-bold text-orange-500">{userInfo.dias}</span>
                     <div className="flex flex-col">
                         <span className="text-orange-200">días</span>
                         <span className="text-orange-300 text-sm">consecutivos</span>
@@ -64,7 +72,7 @@ const UserProfile: React.FC<UserPorileProps> = ({showNavBar}) =>{
                     <div className="flex items-center gap-2 mb-4">
                     <Activity className="h-6 w-6 text-yellow-500" />
                     <h2 className="text-xl font-semibold text-white">Experiencia</h2>
-                    <span className="text-5xl font-bold text-yellow-500">143</span>
+                    <span className="text-5xl font-bold text-yellow-500">{userInfo.exp}</span>
                     <span className="text-orange-200">exp</span>
 
 
@@ -77,11 +85,11 @@ const UserProfile: React.FC<UserPorileProps> = ({showNavBar}) =>{
                     <div className="flex items-center gap-2 mb-4">
                     <Trophy className="h-6 w-6 text-yellow-500" />
                     <h2 className="text-xl font-semibold text-white">Ranking</h2>
-                    <span className="text-5xl font-bold text-yellow-500">#15</span>
+                    <span className="text-5xl font-bold text-yellow-500">#{userInfo.ranking ===0 ? "-" : userInfo.ranking}</span>
                     </div>
                 </div>
 
-
+        
                 
     
             </div>

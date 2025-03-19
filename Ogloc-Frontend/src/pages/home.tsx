@@ -1,8 +1,12 @@
 import React, { useState } from "react";
-import MainLayout from "../layout/mainLayout";
 import { useEffect } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
+
+
+import MainLayout from "../layout/mainLayout";
+
+import AnimationLayout from "../layout/animationLayout";
 
 import LessonCard from "../components/lessonCard";
 
@@ -12,7 +16,7 @@ import AvatarStoreCard from "../components/avatarStoreCard";
 
 import Ranking from "../components/ranking";
 
-import { useNavigate } from "react-router-dom";
+import { data, useNavigate } from "react-router-dom";
 
 
 interface HomeProps {
@@ -25,7 +29,7 @@ interface Lesson {
 
     id: string;
     title: string;
-    quesitons: number;
+    questions: number;
 }
 
 interface Player {
@@ -33,6 +37,16 @@ interface Player {
     username: string,
     exp: number,
     dias: number
+}
+
+
+interface userInfo {
+
+    username: string;
+    exp: number;
+    dias: number;
+    ranking: number;
+
 }
 
 const Home: React.FC<HomeProps> = ({showNavBar})=>{
@@ -43,6 +57,10 @@ const Home: React.FC<HomeProps> = ({showNavBar})=>{
     const [error, setError] = useState<string | null>(null);
 
     const navigate = useNavigate();
+
+    const userId = localStorage.getItem("auth");
+
+    console.log(userId);
 
     useEffect(() => {
 
@@ -56,9 +74,9 @@ const Home: React.FC<HomeProps> = ({showNavBar})=>{
                     axios.get<Lesson[]>("http://localhost:8000/lessons"),
                   ]);
 
+
                 setLessons(lessonsRes.data);
                 setPlayer(rankingRes.data);
-
 
 
             }catch (error) {
@@ -92,15 +110,22 @@ const Home: React.FC<HomeProps> = ({showNavBar})=>{
 
                 
 
-               <div className="flex flex-row gap-5 overflow-x-auto custom-scroll" 
+               <div className="flex flex-row gap-5 custom-scroll py-4" 
                               onWheel={(e) => {
-                                e.currentTarget.scrollLeft += e.deltaY;
+                                e.currentTarget.scrollLeft += e.deltaX;
                             }}>
 
                 
                 {lessons.map((lesson) => (
+
+
+                    <AnimationLayout>
+
+                        <LessonCard key = {lesson.id} id = {lesson.id} title = {lesson.title} questions = {lesson.questions}></LessonCard>
+
+
+                    </AnimationLayout>
                     
-                    <LessonCard key = {lesson.id} title = {lesson.title} QCount = {lesson.quesitons}></LessonCard>
                 ))}
 
 
@@ -108,39 +133,18 @@ const Home: React.FC<HomeProps> = ({showNavBar})=>{
 
                <div className="flex flex-col gap-6 items-center justify-center">
 
-                <motion.div 
-                        animate ={{y: [-5, 5]}}
-                        whileHover={{
-                            y: [-5, 5],  // Movimiento flotante
-                            transition: { repeat: Infinity, repeatType: "reverse", duration: 1.5, ease: "easeInOut" },
-                            scale: 1.1,   // Efecto de escala al pasar el mouse
-                            }}
-                        
-                        
-                    >
+                <AnimationLayout>
+
+                    <QuestionPool/>
+
+                </AnimationLayout>
 
 
-                        <QuestionPool/>
-
-
-                    </motion.div>
-
-                    <motion.div 
-                        animate ={{y: [-5, 5]}}
-                        whileHover={{
-                            y: [-5, 5],  // Movimiento flotante
-                            transition: { repeat: Infinity, repeatType: "reverse", duration: 1.5, ease: "easeInOut" },
-                            scale: 1.1,   // Efecto de escala al pasar el mouse
-                            }}
-                        
-                        
-                    >
-
+                <AnimationLayout>
 
                         <AvatarStoreCard/>
 
-
-                    </motion.div>
+                </AnimationLayout>
 
                     
 

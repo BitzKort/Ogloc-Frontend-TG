@@ -1,4 +1,4 @@
-import React, { use } from "react";
+import React, { use, useState } from "react";
 
 import Logo from "../assets/Ogloc logo 2.png"
 
@@ -11,8 +11,8 @@ import { Flame, Activity, Trophy } from "lucide-react";
 import UserButton from "./userButton";
 import { useNavigate } from "react-router-dom";
 
-interface userInfo {
-
+interface UserInfo {
+    name:string
     username:string
     exp:number,
     dias:number,
@@ -21,11 +21,59 @@ interface userInfo {
 }
 
 
-
 const NavBar: React.FC = () => {
 
+    const [userInfo, setUserInfo] = useState<UserInfo>({
 
+        name:"",
+        username:"",
+        exp:0,
+        dias:0,
+        ranking:0
+
+    });
     const navigate = useNavigate();
+
+    const userId = localStorage.getItem("auth");
+
+
+    useEffect(()=>{
+
+
+        const userInfoRequest = async () => {
+
+
+            try {
+
+                const userInfoRes = await axios.post<UserInfo>("http://localhost:8000/userInfo",
+                                        {},
+                                         { params: {
+                                        id:userId,
+                                    }})
+
+                setUserInfo(userInfoRes.data);
+                localStorage.setItem('userInfo', JSON.stringify(userInfoRes.data));
+    
+    
+    
+            }
+    
+            catch (error) {
+    
+                console.log(error)
+    
+    
+            }
+    
+        }
+
+
+
+       userInfoRequest();
+
+       
+
+    },[])
 
 
 
@@ -40,19 +88,19 @@ const NavBar: React.FC = () => {
                 <div className=" flex flex-row gap-2">
 
                     <Activity className="text-orange-500"/>
-                    <h1 className="text-white font-semibold">123 exp</h1>
+                    <h1 className="text-white font-semibold">{userInfo?.exp} exp</h1>
                 </div>
 
                 <div className=" flex flex-row gap-2">
 
                     <Flame className="text-orange-500"/>
-                    <h1 className="text-white font-semibold">45 dias</h1>
+                    <h1 className="text-white font-semibold">{userInfo?.dias} dias</h1>
                 </div>
 
                 <div className=" flex flex-row gap-2">
 
                     <Trophy className="text-orange-500"/>
-                    <h1 className="text-white font-semibold">#12</h1>
+                    <h1 className="text-white font-semibold"># {userInfo?.ranking === 0? "-" : userInfo?.ranking}</h1>
                 </div>
                 
    
@@ -62,7 +110,7 @@ const NavBar: React.FC = () => {
         
             <div className="flex flex-row gap-5 items-center mx-10">
 
-            <h1 className="text-white  text-lg"> bitzkort</h1>
+            <h1 className="text-white  text-lg"> {userInfo?.username} </h1>
             
             <UserButton></UserButton>
 

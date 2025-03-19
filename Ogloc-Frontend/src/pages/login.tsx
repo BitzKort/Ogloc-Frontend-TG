@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import fondo from "../assets/background login.webp"
 import { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 interface LoginProps {
     toggleForm: () => void;
     valuesLogin: { email: string; password: string }; 
@@ -24,6 +25,8 @@ const Login: React.FC<LoginProps> = ({toggleForm, valuesLogin, setValuesLogin}) 
         email: "",
         password:"",
         })
+
+    const navigate = useNavigate();
     
     
     const [error, setError] = useState<string | null >(null);
@@ -52,7 +55,14 @@ const Login: React.FC<LoginProps> = ({toggleForm, valuesLogin, setValuesLogin}) 
                 //console.log(userData)
 
                 const response = await axios.post("http://localhost:8000/loginUser", userData);
-                console.log(response);
+                
+                if (response.status == 200) {
+
+                    localStorage.setItem('auth', response.data.auth);
+                    navigate("/");
+
+                }
+
             } catch (err) {
 
                 setError("algo paso")   

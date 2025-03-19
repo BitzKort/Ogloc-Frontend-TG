@@ -21,7 +21,7 @@ const Ranking: React.FC<RankingProps> = ({players}) => {
     
     return (
 
-        <div className=" bg-gradient-to-br from-teal-600 to-[#61DECA]/60 rounded-lg w-200">
+        <div className=" bg-gradient-to-br from-teal-600 to-[#61DECA]/60 rounded-lg sm:w-150 md:w-200">
           <div className="bg-white/10 backdrop-blur-lg rounded-2xl shadow-xl overflow-hidden">
             <div className="p-6 text-center">
               <h1 className="text-3xl font-bold text-white mb-2">Player Rankings</h1>

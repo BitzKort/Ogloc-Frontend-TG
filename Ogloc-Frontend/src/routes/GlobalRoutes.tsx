@@ -8,6 +8,7 @@ import QuestionPage from "../pages/questionPage";
 
 const GlobalRoutes = () => {
 
+
     return (
            
           <Routes>
@@ -16,7 +17,7 @@ const GlobalRoutes = () => {
             <Route path="/" element={<Home showNavBar = {true}/>}/>
             <Route path="profile" element  = {<UserProfile showNavBar = {true} />}/>
             <Route path ="store" element = {<StorePage showNavBar = {true} />} />
-            <Route path = "question" element = {<QuestionPage showNavBar = {false}/>}/>
+            <Route path = "question/:id" element = {<QuestionPage showNavBar = {false}/>}/>
     
           </Routes>
 
