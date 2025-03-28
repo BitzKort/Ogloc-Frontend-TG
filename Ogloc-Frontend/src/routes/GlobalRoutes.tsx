@@ -6,11 +6,12 @@ import UserProfile from "../pages/userProfile";
 import StorePage from "../pages/store";
 import QuestionPage from "../pages/questionPage";
 
+
 const GlobalRoutes = () => {
 
 
     return (
-           
+
           <Routes>
     
             <Route path="/Auth" element={<Auth showNavBar = {false} />}/>

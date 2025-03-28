@@ -19,7 +19,7 @@ const AnimationLayout: React.FC<AnimationLayoutProps> = ({children}) => {
         whileHover={{
             y: [-5, 5],  // Movimiento flotante
             transition: { repeat: Infinity, repeatType: "reverse", duration: 1.5, ease: "easeInOut" },
-            scale: 1.1,   // Efecto de escala al pasar el mouse
+            scale: 1.05,   // Efecto de escala al pasar el mouse
             }}
         
         

@@ -1,6 +1,7 @@
-import React from "react"
+import React, { useState } from "react"
 
 import RankingUser from "./rankingUser"
+import Skeleton, { SkeletonTheme } from "react-loading-skeleton"
 
 interface Player {
 
@@ -13,21 +14,28 @@ interface Player {
 interface RankingProps {
 
    players: Player[]
+   loading: boolean
 
 }
 
-const Ranking: React.FC<RankingProps> = ({players}) => {
+const Ranking: React.FC<RankingProps> = ({players, loading}) => {
+
+
+  
+
+
+
 
     
     return (
 
-        <div className=" bg-gradient-to-br from-teal-600 to-[#61DECA]/60 rounded-lg sm:w-150 md:w-200">
-          <div className="bg-white/10 backdrop-blur-lg rounded-2xl shadow-xl overflow-hidden">
+        <div className="w-300 bg-gradient-to-br from-teal-600 to-[#61DECA]/60 rounded-lg sm:w-150 md:w-200">
+          <div className=" flex flex-col bg-white/10 min-w-full backdrop-blur-lg rounded-2xl shadow-xl overflow-hidden">
             <div className="p-6 text-center">
               <h1 className="text-3xl font-bold text-white mb-2">Player Rankings</h1>
               <p className="text-white">Top Players Leaderboard</p>
             </div>
-            
+            <SkeletonTheme baseColor="#0d9488" highlightColor="#61DECA">
             <div className="overflow-x-auto">
               <table className="min-w-full">
                 <thead>
@@ -39,12 +47,30 @@ const Ranking: React.FC<RankingProps> = ({players}) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {players.map((player, index) => (
-                    <RankingUser key = {index} index={index} player={player}/>
-                  ))}
+
+                  {loading ? (
+
+          
+
+                      <Skeleton className="!absolute !h-3" count={3}/>
+
+     
+                    
+                  ) : (
+
+                    players.map((player, index) => (
+                      <RankingUser key = {index} index={index} player={player}/>
+                    ))
+
+
+                  )
+                }
+
+                  
                 </tbody>
               </table>
             </div>
+            </SkeletonTheme>
           </div>
         </div>
     );

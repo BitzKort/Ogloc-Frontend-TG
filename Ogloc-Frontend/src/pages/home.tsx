@@ -18,6 +18,10 @@ import Ranking from "../components/ranking";
 
 import { data, useNavigate } from "react-router-dom";
 
+import Skeleton, {SkeletonTheme} from "react-loading-skeleton";
+
+import "react-loading-skeleton/dist/skeleton.css";
+
 
 interface HomeProps {
 
@@ -56,7 +60,6 @@ const Home: React.FC<HomeProps> = ({showNavBar})=>{
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
-    const navigate = useNavigate();
 
     const userId = localStorage.getItem("auth");
 
@@ -78,11 +81,11 @@ const Home: React.FC<HomeProps> = ({showNavBar})=>{
                 setLessons(lessonsRes.data);
                 setPlayer(rankingRes.data);
 
+                setLoading(false)
+
 
             }catch (error) {
                 setError((error as Error).message);
-              } finally {
-                setLoading(false);
               }
 
         }
@@ -109,27 +112,72 @@ const Home: React.FC<HomeProps> = ({showNavBar})=>{
                 </div>
 
                 
+                <SkeletonTheme baseColor="#202020" highlightColor="#444">
+               <div className="flex flex-row gap-5 min-w-full py-4 custom-scroll overflow-x-auto touch-pan-x" 
 
-               <div className="flex flex-row gap-5 custom-scroll py-4" 
-                              onWheel={(e) => {
-                                e.currentTarget.scrollLeft += e.deltaX;
-                            }}>
+                              onMouseDown={(e) => {
+                                const container = e.currentTarget;
+                                container.dataset.isDragging = "true";
+                                container.dataset.startX = e.clientX.toString();
+                                container.dataset.scrollLeft = container.scrollLeft.toString();
+                                container.style.cursor = 'grabbing';
+                                e.preventDefault();
+                              }}
+                              onMouseMove={(e) => {
+                                const container = e.currentTarget;
+                                if (container.dataset.isDragging === "true") {
+                                  const startX = parseFloat(container.dataset.startX || "0");
+                                  const scrollLeft = parseFloat(container.dataset.scrollLeft || "0");
+                                  container.scrollLeft = scrollLeft - (e.clientX - startX);
+                                }
+                              }}
+                              onMouseUp={(e) => {
+                                const container = e.currentTarget;
+                                container.dataset.isDragging = "false";
+                                container.style.cursor = 'grab';
+                              }}
+                              onMouseLeave={(e) => {
+                                const container = e.currentTarget;
+                                container.dataset.isDragging = "false";
+                                container.style.cursor = 'grab';
+                              }}
+                              style={{ cursor: 'grab' }}>
 
                 
-                {lessons.map((lesson) => (
+
+                    {loading ?
+
+                    (  <div className="flex flex-row gap-4">
+                        {Array.from({ length: 6 }).map((_, index) => ( 
+                          <div key={index} >
+                            <Skeleton 
+                              className="!w-60 !h-40 rounded-lg" // Si tus cards tienen bordes redondeados
+                            />
+                          </div>
+                        ))}
+                      </div>
+
+                    )
+                    : 
+                    ( lessons.map((lesson) => (
 
 
-                    <AnimationLayout>
+                        <AnimationLayout>
 
-                        <LessonCard key = {lesson.id} id = {lesson.id} title = {lesson.title} questions = {lesson.questions}></LessonCard>
+                            <LessonCard key = {lesson.id} id = {lesson.id} title = {lesson.title} questions = {lesson.questions}></LessonCard>
 
 
-                    </AnimationLayout>
-                    
-                ))}
+                        </AnimationLayout>
+                        
+                    )))
+
+
+                }
+                
 
 
                </div>
+               </SkeletonTheme>
 
                <div className="flex flex-col gap-6 items-center justify-center">
 
@@ -149,9 +197,9 @@ const Home: React.FC<HomeProps> = ({showNavBar})=>{
                     
 
                     
+                
                     
-
-                    <Ranking players={player}/>
+                    <Ranking players={player} loading = {loading}/>
 
 
 

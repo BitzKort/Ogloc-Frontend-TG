@@ -10,6 +10,9 @@ import { useNavigate } from "react-router-dom";
 
 import axios from "axios";
 
+import Skeleton, {SkeletonTheme} from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
+
 interface QuestionPageProps {
 
     showNavBar: boolean
@@ -37,23 +40,37 @@ const QuestionPage: React.FC<QuestionPageProps> =({showNavBar}) => {
         questions: ""
     });
 
+    const [loading, setLoading] = useState(true);
+
 
     useEffect(() =>{
 
 
         const getLesson = async () => {
 
+            try{
+
+                const lessonRes = await axios.get<lesson>("http://localhost:8000/lesson",
+                    { params: {
+                   id:id,
+               }})
+   
+               console.log(lessonRes.data)
+   
+   
+               setLessonInfo(lessonRes.data);
+
+               setLoading(false);
 
 
-            const lessonRes = await axios.get<lesson>("http://localhost:8000/lesson",
-                 { params: {
-                id:id,
-            }})
 
-            console.log(lessonRes.data)
+                
+            }catch(error) {
 
+                console.log(error)
+            }
 
-            setLessonInfo(lessonRes.data);
+            
     
         }
 
@@ -71,22 +88,69 @@ const QuestionPage: React.FC<QuestionPageProps> =({showNavBar}) => {
         <MainLayout navBar = {showNavBar}>
 
 
-            <div className="flex-col min-w-full "> 
+            <div className="flex-col min-w-full ">
+
+                <SkeletonTheme baseColor="#202020" highlightColor="#444">
 
                 <div className=" flex flex-col justify-center items-center ">
-                    <span className=" text-xl font-semibold text-white left-1/2">{lessonInfo.title}</span>
-                    <span className=" text-xl font-semibold text-white left-1/2">1/{lessonInfo.questions}</span>
+                    <span className=" text-xl font-semibold text-white left-1/2">
+                    
+                    {loading ? (
+
+                        <Skeleton className="!w-40"/>
+
+                    ) :(
+
+                        lessonInfo.title
+                    )}
+                    
+                    </span>
+                    <span className=" text-xl font-semibold text-white left-1/2">
+                    
+                    {loading ? (
+
+                        <Skeleton className="!w-20"/>
+
+                    ) :(
+
+                        lessonInfo.title
+                    )}
+                    
+                    </span>
 
                 </div>
 
                 <div className="flex flex-row min-w-full items-center justify-around py-4 px-15">
 
-                    <div  className="self-start max-w-xl    text-white  bg-[#444444] rounded-xl p-5"> {lessonInfo.text}</div>
+                    <div  className="self-start max-w-xl    text-white  bg-[#444444] rounded-xl p-5"> 
+                        
+                        {loading ? (
+
+                            <Skeleton className="!w-80 !h-3 !rounded-xl" count={10}/>
+                        ) : (
+
+                            `1/ ${lessonInfo.questions}`
+                            
+                        
+                        )}
+                        
+                        </div>
 
                     
                     <div className="max-w-md flex self-start flex-col p-5 gap-6 rounded-xl bg-[#444444]">
 
-                        <p className="text-white"> {lessonInfo.questions} </p>
+                        <SkeletonTheme baseColor="#0d9488" highlightColor="#61DECA">
+                        <p className="text-white">
+                            
+                            {loading ? (
+
+                                <Skeleton className="!w-65 !h-4" count={3}/>
+                            ) : (
+
+                                lessonInfo.questions
+                            )}
+                        
+                        </p>
 
                         <input className="p-5 m-5 border bg-white/70 rounded-xl" placeholder="espacio para la respuesta"></input>
 
@@ -114,7 +178,7 @@ const QuestionPage: React.FC<QuestionPageProps> =({showNavBar}) => {
                         
  
 
-
+                        </SkeletonTheme>
                     </div>
                     
                 </div>
@@ -133,6 +197,8 @@ const QuestionPage: React.FC<QuestionPageProps> =({showNavBar}) => {
                            <span>Salir de la leccion</span>
                        </button>               
 
+                
+                </SkeletonTheme> 
             </div>
 
 
