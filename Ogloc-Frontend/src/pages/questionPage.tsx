@@ -27,6 +27,26 @@ interface lesson {
 
 const QuestionPage: React.FC<QuestionPageProps> =({showNavBar}) => {
 
+    const [text, setText] = useState<string>();
+    function speechToText(){
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+
+        recognition.lang = "en-US"
+
+        recognition.onresult = async function(event){
+            const transcript = event.results[0][0].transcript;
+            setText(transcript);
+        }
+        recognition.start()
+        
+    }
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setText(e.target.value);
+      };
+
     const {id} = useParams();
     const navigate = useNavigate();
 
@@ -78,7 +98,7 @@ const QuestionPage: React.FC<QuestionPageProps> =({showNavBar}) => {
 
         
 
-        },[])
+        },[id])
 
 
 
@@ -113,7 +133,7 @@ const QuestionPage: React.FC<QuestionPageProps> =({showNavBar}) => {
 
                     ) :(
 
-                        lessonInfo.title
+                        lessonInfo.questions
                     )}
                     
                     </span>
@@ -152,7 +172,7 @@ const QuestionPage: React.FC<QuestionPageProps> =({showNavBar}) => {
                         
                         </p>
 
-                        <input className="p-5 m-5 border bg-white/70 rounded-xl" placeholder="espacio para la respuesta"></input>
+                        <input  className="p-5 m-5 border bg-white/70 rounded-xl" placeholder="espacio para la respuesta" onChange={handleChange} value={text}></input>
 
 
                         <div className="flex flex-row justify-between">
@@ -167,6 +187,7 @@ const QuestionPage: React.FC<QuestionPageProps> =({showNavBar}) => {
                             </button>
 
                             <button
+                                onClick={speechToText}
                                 
                                 className="flex items-center gap-2 px-4 py-2 bg-white/20 text-white rounded-full hover:text-[#61DECA]/60 shadow-sm hover:shadow-gray-600"
                                 >
