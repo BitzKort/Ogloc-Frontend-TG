@@ -33,6 +33,7 @@ function UserButton() {
   const handleLogout = () => {
     // Add logout logic here
 
+    localStorage.removeItem('auth');
     navigate("/Auth")
     console.log('Logging out...');
   };
@@ -55,7 +56,7 @@ function UserButton() {
             {isMenuOpen && (
               <div 
                 ref={menuRef}
-                className="absolute right-0 mt-2 w-48 bg-[#404040] rounded-md shadow-lg py-1 z-10 border border-gray-200"
+                className="absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 z-10 border border-gray-200"
               >
                 <button
                   onClick={() => {

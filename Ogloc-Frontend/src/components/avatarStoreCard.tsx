@@ -17,7 +17,11 @@ const AvatarStoreCard: React.FC = () => {
 
     return (
 
-        <div className="flex flex-col gap-2 bg-[#61DECA]/60 items-center justify-center  min-w-full py-8 sm:px-2 md:px-10 lg:px-80 rounded-lg" onClick={() => {navigate("/store")}}>
+        <div onClick={() => navigate('/store')}
+            className={` flex flex-col items-center justify-center bg-[#61DECA]/60 w-full py-8 px-4 sm:px-8 md:px-16 lg:px-45 rounded-lg cursor-pointer
+                            transition-transform duration-200
+                            hover:scale-[1.02]`}
+            >
 
             <div className="flex flex-row gap-5  justify-center items-center">
 
@@ -27,7 +31,7 @@ const AvatarStoreCard: React.FC = () => {
                 key={index}
                 src={src}
                 alt={`img-${index}`}
-                className="w-32 h-32 object-contain rounded-4xl shadow-sm shadow-gray-600"
+                className="w-18 h-32 object-contain rounded-4xl shadow-sm shadow-gray-600"
                 animate={{ rotateY: [0, 360] }} // Gira en bucle
                 transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: index * 0.8 }}
                 />
@@ -36,7 +40,7 @@ const AvatarStoreCard: React.FC = () => {
                 
             </div>
 
-            <h1 className="ml-10 text-2xl"> Consigue puntos de experiencia para cambiar a tu avatar</h1>
+            <h1 className="text-xl sm:text-xl md:text-2xl text-center leading-snug"> Consigue puntos de experiencia para cambiar a tu avatar</h1>
 
         </div>
 

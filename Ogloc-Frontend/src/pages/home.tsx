@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import { useEffect } from "react";
 import axios from "axios";
-import { motion } from "framer-motion";
-
 
 import MainLayout from "../layout/mainLayout";
 
@@ -16,12 +14,12 @@ import AvatarStoreCard from "../components/avatarStoreCard";
 
 import Ranking from "../components/ranking";
 
-import { data, useNavigate } from "react-router-dom";
 
 import Skeleton, {SkeletonTheme} from "react-loading-skeleton";
 
 import "react-loading-skeleton/dist/skeleton.css";
 
+import { useNavigate } from "react-router-dom";
 
 interface HomeProps {
 
@@ -29,18 +27,24 @@ interface HomeProps {
 
 }
 
-interface Lesson {
 
-    id: string;
-    title: string;
-    questions: number;
+interface Lesson {
+  id: string;
+  title: string;
+  question_count: number;
+}
+
+interface Lessons {
+  status: string;
+  pending_lessons: Lesson[];
+  total_pending:number        
 }
 
 interface Player {
 
     username: string,
     exp: number,
-    dias: number
+    days: number
 }
 
 
@@ -48,50 +52,62 @@ interface userInfo {
 
     username: string;
     exp: number;
-    dias: number;
+    days: number;
     ranking: number;
 
 }
 
 const Home: React.FC<HomeProps> = ({showNavBar})=>{
 
-    const [lessons, setLessons] = useState<Lesson[]>([]);
+    const [lessons, setLessons] = useState<Lessons>({
+  status: "",
+  pending_lessons: [],
+  total_pending: 0,
+});
     const [player, setPlayer] = useState<Player[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
-
-    const userId = localStorage.getItem("auth");
-
-    console.log(userId);
-
-    useEffect(() => {
-
-        const fetchData = async () => {
-
-            try{
+    const navigate = useNavigate();
 
 
-                const [rankingRes, lessonsRes] = await Promise.all([
-                    axios.get<Player[]>("http://localhost:8000/ranking"),
-                    axios.get<Lesson[]>("http://localhost:8000/lessons"),
-                  ]);
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      // 1. Recupera el token del localStorage
+      const token = localStorage.getItem("auth");
+      if (!token) {
+      console.warn('No se encontró token de autenticación');
+      navigate("/auth");
+      return;
+      }
 
+      // 2. Crea la configuración con el header Authorization
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
 
-                setLessons(lessonsRes.data);
-                setPlayer(rankingRes.data);
+      // 3. Lanza las dos peticiones en paralelo
+      const [rankingRes, lessonsRes] = await Promise.all([
+        axios.get<Player[]>("http://localhost:8000/ranking", config),
+        axios.get<Lessons>("http://localhost:8000/AllLessons", config),
+      ]);
 
-                setLoading(false)
+      console.log(lessonsRes.data)
+      // 4. Guarda resultados en el estado
+      setLessons(lessonsRes.data);
+      setPlayer(rankingRes.data);
+      setLoading(false);
+    } catch (error) {
+      setError((error as Error).message);
+      console.error(error);
+    }
+  };
 
-
-            }catch (error) {
-                setError((error as Error).message);
-              }
-
-        }
-        
-        fetchData();
-    }, []);
+  fetchData();
+}, []);
 
 
 
@@ -100,15 +116,19 @@ const Home: React.FC<HomeProps> = ({showNavBar})=>{
 
         <MainLayout navBar={showNavBar} >
 
-            <div className="flex flex-col gap-6 min-w-full min-h-full">
-
-                <div className=" w-200 bg-[#00FFFF50]" 
-                     style={{
-                        clipPath: "polygon(0% 0%, 80% 0%, 95% 100%, 0% 100%)"
-                }}>
-
-                    <h1 className="text-3xl font-bold text-white m-2"> Modulos <br /> &emsp;  de preguntas</h1>
-
+            <div className=" flex flex-col gap-6 w-full h-full p-4">
+                <div
+                  className={`
+                    bg-[#00FFFF50] 
+                    w-full 
+                    lg:w-1/2 
+                    [clip-path:polygon(0%_0%,80%_0%,95%_100%,0%_100%)]
+                    transition-all duration-300
+                  `}
+                >
+                  <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white p-4">
+                    Módulos <br />&emsp;de preguntas
+                  </h1>
                 </div>
 
                 
@@ -151,7 +171,7 @@ const Home: React.FC<HomeProps> = ({showNavBar})=>{
                         {Array.from({ length: 6 }).map((_, index) => ( 
                           <div key={index} >
                             <Skeleton 
-                              className="!w-60 !h-40 rounded-lg" // Si tus cards tienen bordes redondeados
+                              className="!w-60 !h-40 rounded-lg" 
                             />
                           </div>
                         ))}
@@ -159,12 +179,12 @@ const Home: React.FC<HomeProps> = ({showNavBar})=>{
 
                     )
                     : 
-                    ( lessons.map((lesson) => (
+                    ( lessons.pending_lessons.map((lesson) => (
 
 
                         <AnimationLayout>
 
-                            <LessonCard key = {lesson.id} id = {lesson.id} title = {lesson.title} questions = {lesson.questions}></LessonCard>
+                            <LessonCard key = {lesson.id} id = {lesson.id} title = {lesson.title} questions = {lesson.question_count}></LessonCard>
 
 
                         </AnimationLayout>

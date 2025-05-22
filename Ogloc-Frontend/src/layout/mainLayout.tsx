@@ -16,7 +16,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({children, navBar}) => {
 
         //style={{ backgroundImage: `url(${fondo})` }}
 
-        <div className="flex flex-col min-h-screen bg-cover bg-center bg-[#2E2E2E]"  >
+        <div className="flex flex-col min-h-screen bg-cover bg-center bg-[#2E2E2E]"  style={{ backgroundImage: `url(${fondo})` }}>
         
         {navBar && <NavBar/>}
 

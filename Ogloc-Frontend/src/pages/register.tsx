@@ -94,65 +94,112 @@ const Register: React.FC<RegisterProps> = ({toggleForm, valuesRegister, setValue
 
     return (
 
-        <div className="flex flex-row items-center ">
-
-            <div className="flex flex-col items-center justify-center w-full h-full py-70 px-10 bg-[#457884] rounded-2xl shadow-sm shadow-gray-500">
-
-                <img src={avatar} className="w-32 h-auto "></img>
-                <h1 className="text-2xl text-center max-w-xs"> Crea tu cuenta y comienza a ganar XP</h1>
-                
-
-            </div>
-            
-            <div className="flex flex-col gap-3 py-6 px-10 items-center justify-center bg-white rounded-2xl shadow-sm shadow-gray-500">
-
-            
-                <div className="flex flex-row items-center w-full">
-
-                    <img src={avatar} className="w-32 h-auto"></img>
-
-                    <h1 className="text-2xl text-center max-w-xs"> Crea tu cuenta y comienza a ganar XP</h1>
-                    
-                </div>
-                
+   <div className="flex justify-center items-center min-h-screen p-4">
+    <div className="w-full max-w-2xl bg-white rounded-2xl shadow-lg shadow-gray-300/50 p-6 md:p-10 transition-all duration-300 hover:shadow-gray-400/60">
         
-                    <div className="flex flex-col gap-2 px-5">
+        {/* Sección superior - Imagen y título */}
+        <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8 mb-8">
+            <img 
+                src={avatar} 
+                className="w-16 md:w-24 h-auto object-contain animate-fade-in"
+                alt="Avatar"
+            />
+            <h1 className="text-lg md:text-xl lg:text-2xl text-center font-semibold text-gray-800">
+                Crea tu cuenta y comienza a ganar XP
+            </h1>
+        </div>
 
-                        <label > Nombre </label>
-                        <input onChange={catchUserData} value ={valuesRegister.name} name="name" placeholder="nombre" className="bg-[#1C212B] text-white text-md w-80 py-3 px-6 rounded-md "/>
-
-                        <label > Nombre de Usuario </label>
-                        <input onChange={catchUserData} value ={valuesRegister.username} name="username" placeholder="Nombre de Usuario" className="bg-[#1C212B] text-white text-md w-80 py-3 px-6 rounded-md "/>
-                        
-                        <label> Email </label>
-                        <input onChange={catchUserData} value ={valuesRegister.email} name="email" placeholder="Email" className="bg-[#1C212B] text-white text-md w-80 py-3 px-6 rounded-md "/>
-                        <label> Contraseña </label>
-                        <input onChange={catchUserData} value ={valuesRegister.password} name="password" type="password" placeholder="Contraseña" className="bg-[#1C212B] text-white text-md w-80 py-3 px-6 rounded-md "/>
-
-                        <input name="confirmPassword" type="password" placeholder="Confirmar Contraseña" className="bg-[#1C212B] text-white text-md w-80 py-3 px-6 rounded-md "/>
-                    </div> 
-                    
-                <div className="w-full flex justify-end pt-10">
-                    
-                    <button onClick={submitUserData} className="bg-[#457884] hover:bg-[#3E6973] text-white text-md py-2 px-7 rounded"> Registrarse</button>
-
-                </div>
-
-                <div className="flex flex-col justify-center items-center pt-10">
-
-                    <p> ya tienes cuenta? 
-                        
-                        <a  onClick={algo} className=" text-[#61DECA] hover:text-[#457884]"> Inicia sesion.</a>
-
-
-                    </p>
-
+        {/* Formulario */}
+        <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                {/* Columna izquierda */}
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Nombre</label>
+                        <input 
+                            onChange={catchUserData}
+                            value={valuesRegister.name}
+                            name="name"
+                            placeholder="Nombre"
+                            className="w-full bg-[#1C212B] text-white text-sm md:text-base px-4 md:px-6 py-3 rounded-lg focus:ring-2 focus:ring-[#457884] focus:outline-none transition-all"
+                        />
                     </div>
+                    
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                        <input 
+                            onChange={catchUserData}
+                            value={valuesRegister.email}
+                            name="email"
+                            placeholder="Email"
+                            className="w-full bg-[#1C212B] text-white text-sm md:text-base px-4 md:px-6 py-3 rounded-lg focus:ring-2 focus:ring-[#457884] focus:outline-none transition-all"
+                        />
+                    </div>
+                </div>
 
-        
+                {/* Columna derecha */}
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Usuario</label>
+                        <input 
+                            onChange={catchUserData}
+                            value={valuesRegister.username}
+                            name="username"
+                            placeholder="Nombre de Usuario"
+                            className="w-full bg-[#1C212B] text-white text-sm md:text-base px-4 md:px-6 py-3 rounded-lg focus:ring-2 focus:ring-[#457884] focus:outline-none transition-all"
+                        />
+                    </div>
+                    
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Contraseña</label>
+                        <input 
+                            onChange={catchUserData}
+                            value={valuesRegister.password}
+                            name="password"
+                            type="password"
+                            placeholder="Contraseña"
+                            className="w-full bg-[#1C212B] text-white text-sm md:text-base px-4 md:px-6 py-3 rounded-lg focus:ring-2 focus:ring-[#457884] focus:outline-none transition-all"
+                        />
+                    </div>
+                </div>
+            </div>
 
+            {/* Confirmar Contraseña */}
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Confirmar Contraseña</label>
+                <input 
+                    name="confirmPassword"
+                    type="password"
+                    placeholder="Confirmar Contraseña"
+                    className="w-full max-w-xs md:max-w-sm bg-[#1C212B] text-white text-sm md:text-base px-4 md:px-6 py-3 rounded-lg focus:ring-2 focus:ring-[#457884] focus:outline-none transition-all"
+                />
             </div>
         </div>
+
+        {/* Botón de Registro */}
+        <div className="mt-8 md:mt-12 flex justify-end">
+            <button 
+                onClick={submitUserData}
+                className="bg-[#457884] hover:bg-[#3E6973] text-white text-sm md:text-base px-6 md:px-8 py-2 md:py-3 rounded-lg transition-all duration-300 transform hover:scale-105"
+            >
+                Registrarse
+            </button>
+        </div>
+
+        {/* Enlace de Login */}
+        <div className="mt-6 text-center">
+            <p className="text-gray-600 text-sm">
+                ¿Ya tienes cuenta?{' '}
+                <a 
+                    onClick={algo}
+                    className="text-[#61DECA] hover:text-[#457884] cursor-pointer transition-colors"
+                >
+                    Inicia sesión
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
     )    
 
 

@@ -1,77 +1,58 @@
 import React from "react";
 import logo from '../assets/rana-Ogloc.svg';
+import { LocateFixed, Mail } from "lucide-react";
 
-import { LocateFixed, Mail, Github } from "lucide-react";
-const Footer : React.FC = () => {
-
-    return (
-
-    <div className="bg-[#61DECA]/60 font-roboto text-lg text-white">
-
-        <div className=" h-25 flex items-center justify-between mx-10">
-        
-            <div className="flex flex-row gap-4 items-center justify-center">
-
-
-                <h1 className=" text-2xl whitespace-normal"> English <br /> &emsp;  with Ogloc</h1>
-                <img src={logo} className="w-32 h-32 object-contain"></img>
-
+const Footer: React.FC = () => {
+  return (
+    <div className="bg-[#61DECA]/60 font-roboto text-white w-full">
+      <div className="container mx-auto sm:px-4">
+        {/* Primera sección */}
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-2">
+          {/* Logo y título */}
+          <div className="flex items-center gap-4 flex-1 min-w-[300px]">
+            <div className="flex flex-col items-end">
+              <h1 className="text-sm md:text-lg whitespace-nowrap">English with Ogloc</h1>
             </div>
-            
-            <div>
+            <img 
+              src={logo} 
+              className="w-16 h-16 md:w-24 md:h-24 object-contain" 
+              alt="Logo Ogloc"
+            />
+          </div>
 
-                <div className="flex flex-row gap-4">
-
-                    <LocateFixed className="text-white"/>
-                    <h2> Tulua, valle del cauca</h2>
-                    
-                </div>
-
-                <div className="flex flex-row gap-4">
-
-                    <Mail className="text-white"/>
-                    <h2> miguel.angel.rivera@correounivalle.edu.co</h2>
-
-                </div>
-                
-                
-                
+          {/* Información de contacto */}
+          <div className="flex flex-col gap-2 flex-1 md:text-right min-w-[300px]">
+            <div className="flex items-center md:justify-end gap-2">
+              <LocateFixed className="text-white shrink-0" />
+              <span className="text-sm md:text-lg">Tulua, valle del cauca</span>
             </div>
-
+            <div className="flex items-center md:justify-end gap-2">
+              <Mail className="text-white shrink-0" />
+              <span className="text-sm md:text-lg whitespace-nowrap">
+                englishwithogloc@gmail.com
+              </span>
+            </div>
+          </div>
         </div>
 
-        <hr/>
+        <hr className="border-white/30 mb-4 w-full" />
 
-        <div className="h-15 flex items-center justify-between mx-10">
-
-            <div className="flex gap-3">
-
-                <h3> About</h3>
-                <h3> Contact</h3>
-
-                <div className="flex flex-row  gap-1">
-
-            
-                <h3> GitHub</h3>
-                </div>
-                
-                <h3> LinkedIn</h3>
-                    
-            </div>
-            <h3 >© 2025 Ogloc Corp. All rights reserved</h3>
-            
-
-
+        {/* Segunda sección */}
+        <div className="flex flex-col-reverse md:flex-row items-center justify-between gap-4">
+          <div className="flex flex-wrap justify-center gap-4 md:gap-6">
+            <a href="#" className="hover:text-gray-200 transition-colors">About</a>
+            <a href="#" className="hover:text-gray-200 transition-colors">Contact</a>
+            <a href="#" className="hover:text-gray-200 transition-colors">GitHub</a>
+            <a href="#" className="hover:text-gray-200 transition-colors">LinkedIn</a>
+          </div>
+          
+          <p className="text-sm text-center md:text-right whitespace-nowrap">
+            © 2025 Ogloc Corp. All rights reserved
+          </p>
         </div>
-
-        
-         
-
+      </div>
     </div>
+  );
+};
 
-    )
-
-}
-
-
-export default Footer
+export default Footer;

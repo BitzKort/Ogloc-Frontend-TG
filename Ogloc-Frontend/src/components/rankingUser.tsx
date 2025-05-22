@@ -5,7 +5,7 @@ interface Player {
     
     username: string,
     exp: number,
-    dias: number
+    days: number
 }
 
 
@@ -20,34 +20,30 @@ interface RankingUserProps {
 const RankingUser: React.FC<RankingUserProps> = ({index, player}) => {
 
 
-    return (
-
-        <tr 
-        key={index}
-      >
-        <td className="px-6 py-4">
-          <div className="flex items-center text-white gap-2">
-              {index}
-           
-          </div>
-        </td>
-        <td className="px-6 py-4">
-          <span className="text-white font-semibold">{player.username}</span>
-        </td>
-        <td className="px-6 py-4 text-right items-center justify-center">
-          <span className="text-yellow-400 font-bold font-mono font-bold">
-            {player.exp.toLocaleString()}
-          </span>
-        </td>
-        <td className="px-6 py-4 text-right">
-          <span className="text-purple-200">
-            {player.dias} days
-          </span>
-        </td>
-      </tr>
-
-
-    )
+     return (
+    <tr>
+      <td className="px-4 sm:px-6 py-2 text-sm sm:text-base">
+        <div className="flex items-center text-white">
+          {index + 1}
+        </div>
+      </td>
+      <td className="px-4 sm:px-6 py-2 text-sm sm:text-base">
+        <span className="text-white font-semibold">
+          {player.username}
+        </span>
+      </td>
+      <td className="px-4 sm:px-6 py-2 text-right">
+        <span className="text-yellow-400 font-bold font-mono text-sm sm:text-base">
+          {player.exp.toLocaleString()}
+        </span>
+      </td>
+      <td className="px-4 sm:px-6 py-2 text-right">
+        <span className="text-purple-200 text-sm sm:text-base">
+          {player.days} days
+        </span>
+      </td>
+    </tr>
+  );
 
 }
 
