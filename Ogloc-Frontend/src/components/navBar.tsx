@@ -78,75 +78,71 @@ useEffect(() => {
 
 
     return (
-        <div className="flex flex-col md:flex-row justify-between items-center px-4 md:px-8 py-3 shadow-md shadow-gray-500">
+        <div className="flex flex-row justify-between items-center px-4 md:px-8 py-3 shadow-md shadow-gray-500">
             <SkeletonTheme baseColor="#202020" highlightColor="#444">
                 {/* Logo y título */}
                 <div className="flex items-center cursor-pointer" onClick={() => navigate("/")}>
-                    <img 
-                        src={Logo} 
-                        alt="Logo" 
-                        className="w-12 h-auto md:w-12 mr-2" 
+                    <img
+                        src={Logo}
+                        alt="Logo"
+                        className="w-12 h-auto md:w-12 mr-2"
                     />
                     <h1 className="hidden md:block text-xl text-white">
-                        English<br/>&emsp;with Ogloc
+                        English<br />&emsp;with Ogloc
                     </h1>
                 </div>
 
                 {/* Stats - Versión desktop */}
                 <div className="hidden md:flex gap-6 items-center">
                     <div className="flex items-center gap-2">
-                        <Activity className="text-yellow-500"/>
+                        <Activity className="text-yellow-500" />
                         <span className="text-white font-semibold">
                             {loading ? <Skeleton width={50} /> : `${userInfo.exp} exp`}
                         </span>
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <Flame className="text-orange-500"/>
+                        <Flame className="text-orange-500" />
                         <span className="text-white font-semibold">
                             {loading ? <Skeleton width={50} /> : `${userInfo.days} Dias`}
                         </span>
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <Trophy className="text-yellow-500"/>
+                        <Trophy className="text-yellow-500" />
                         <span className="text-white font-semibold">
                             {loading ? <Skeleton width={50} /> : `#${userInfo.ranking}`}
                         </span>
                     </div>
                 </div>
 
-                {/* Stats - Versión móvil (dropdown) */}
-               <div className="md:hidden w-full my-2">
-    <details className="dropdown">
-        <summary className="btn btn-sm border-none shadow-md shadow-gray-500 text-white flex items-center justify-center w-full">
-            <Menu className="text-white w-6 h-6" /> {/* Icono de hamburguesa */}
-        </summary>
-        <ul className="p-2 dropdown-content z-[1] shadow-lg shadow-gray-500 rounded-lg w-full">
-            <li className="flex text-white justify-between py-2 px-3 hover:bg-gray-700 transition-colors">
-                <span className="flex items-center gap-2">
-                    <Activity className="text-yellow-500" size={18}/>
-                    EXP:
-                </span>
-                {loading ? <Skeleton width={40} /> : userInfo.exp}
-            </li>
-            <li className="flex text-white justify-between py-2 px-3 hover:bg-gray-700 transition-colors">
-                <span className="flex items-center gap-2">
-                    <Flame className="text-orange-500" size={18}/>
-                    Días:
-                </span>
-                {loading ? <Skeleton width={40} /> : userInfo.days}
-            </li>
-            <li className="flex text-white justify-between py-2 px-3 hover:bg-gray-700 transition-colors">
-                <span className="flex items-center gap-2">
-                    <Trophy className="text-orange-500" size={18}/>
-                    Ranking:
-                </span>
-                {loading ? <Skeleton width={40} /> : userInfo.ranking}
-            </li>
-        </ul>
-    </details>
-</div>
+                {/* Stats - Versión md*/}
+                <div className="md:hidden my-2">
+
+                    <ul className="p-1 backdrop-blur-sm shadow-lg shadow-gray-500 rounded-lg w-full">
+                        <li className="flex text-white justify-between py-1 px-3 gap-12 hover:bg-gray-700 transition-colors">
+                            <span className="flex items-center gap-2">
+                                <Activity className="text-yellow-500" size={18} />
+                                EXP:
+                            </span>
+                            {loading ? <Skeleton width={40} /> : userInfo.exp}
+                        </li>
+                        <li className="flex text-white justify-between py-1 px-3 hover:bg-gray-700 transition-colors">
+                            <span className="flex items-center gap-2">
+                                <Flame className="text-orange-500" size={18} />
+                                Días:
+                            </span>
+                            {loading ? <Skeleton width={40} /> : userInfo.days}
+                        </li>
+                        <li className="flex text-white justify-between py-1 px-3 hover:bg-gray-700 transition-colors">
+                            <span className="flex items-center gap-2">
+                                <Trophy className="text-orange-500" size={18} />
+                                Ranking:
+                            </span>
+                            {loading ? <Skeleton width={40} /> : userInfo.ranking}
+                        </li>
+                    </ul>
+                </div>
 
                 {/* User Info */}
                 <div className="flex items-center gap-3 md:gap-5">

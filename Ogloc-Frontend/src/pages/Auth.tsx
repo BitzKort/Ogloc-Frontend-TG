@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import {motion} from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import MainLayout from "../layout/mainLayout";
 import Login from "./login";
 import Register from "./register";
+
 
 interface AuthProps {
 
@@ -10,56 +11,73 @@ interface AuthProps {
 }
 
 
-const Auth: React.FC<AuthProps> = ({showNavBar}) => {
+const Auth: React.FC<AuthProps> = ({ showNavBar }) => {
 
     const [isFlipped, setIsFlipped] = useState(false);
 
     const [valuesLogin, setValuesLogin] = useState({ email: "", password: "" });
 
-    const [valuesRegister, setValuesRegister] = useState({name: "", username: "", email: "", password: ""});
+    const [valuesRegister, setValuesRegister] = useState({ name: "", username: "", email: "", password: "" });
 
     const toggleForm = () => {
+
         setIsFlipped(!isFlipped);
 
     }
 
-    useEffect (() => {
+    useEffect(() => {
 
-        setValuesLogin({email:"", password:""})
+        setValuesLogin({ email: "", password: "" })
     }, [isFlipped]);
 
 
-    useEffect (() => {
+    useEffect(() => {
 
-        setValuesRegister({name: "", username: "", email: "", password: ""})
+        setValuesRegister({ name: "", username: "", email: "", password: "" })
     }, [isFlipped]);
 
     return (
 
-        <MainLayout navBar = {showNavBar}>
+        <MainLayout navBar={showNavBar}>
 
-            <div >
+            <div>
+                <AnimatePresence mode="wait">
+                    {!isFlipped ? (
                         <motion.div
-                           
-                            initial={false}
-                            animate={{ rotateY: isFlipped ? 180 : 0 }}
-                            transition={{ duration: 0.4 }}
+                            key="login"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1, rotateY: 0 }}
+                            transition={{ duration: 0.8 }}
                             style={{ transformStyle: "preserve-3d" }}
                         >
-                            <div className={` backface-hidden ${isFlipped ? "hidden" : ""}`}>
-                                <Login toggleForm={toggleForm} valuesLogin = {valuesLogin} setValuesLogin = {setValuesLogin} />
-                            </div>
-
-    
-                            <div className={` backface-hidden ${isFlipped ? "" : "hidden"} rotate-y-180`}>
-                                <Register toggleForm={toggleForm} valuesRegister = {valuesRegister} setValuesRegister = {setValuesRegister} />
-                            </div>
+                            <Login
+                                toggleForm={toggleForm}
+                                valuesLogin={valuesLogin}
+                                setValuesLogin={setValuesLogin}
+                            />
                         </motion.div>
+                    ) : (
+                        <motion.div
+                            key="register"
+                            initial={{ rotateY: 180, opacity: 0 }}
+                            animate={{ rotateY: 0, opacity: 1 }}
+                            exit={{ rotateY: 180, opacity: 0 }}
+                            transition={{ duration: 0.8 }}
+                            style={{ transformStyle: "preserve-3d" }}
+                        >
+                            <Register
+                                toggleForm={toggleForm}
+                                valuesRegister={valuesRegister}
+                                setValuesRegister={setValuesRegister}
+                            />
+                        </motion.div>
+                    )}
+                    -       </AnimatePresence>
             </div>
 
         </MainLayout>
 
-        
+
     )
 
 

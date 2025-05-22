@@ -11,7 +11,7 @@ const Footer: React.FC = () => {
           {/* Logo y título */}
           <div className="flex items-center gap-4 flex-1 min-w-[300px]">
             <div className="flex flex-col items-end">
-              <h1 className="text-sm md:text-lg whitespace-nowrap">English with Ogloc</h1>
+              <h1 className="text-sm md:text-lg whitespace-nowrap">English <br /> &emsp; with Ogloc</h1>
             </div>
             <img 
               src={logo} 

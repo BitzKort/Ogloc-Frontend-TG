@@ -20,7 +20,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({children, navBar}) => {
         
         {navBar && <NavBar/>}
 
-        <main className=" flex flex-grow justify-center m-2 sm:m-3 md:m-7 lg:m-11 xl:m-15">
+        <main className=" flex flex-grow justify-center m-2 sm:m-3">
 
             {children}
 

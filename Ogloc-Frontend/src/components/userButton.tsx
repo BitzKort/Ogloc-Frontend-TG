@@ -56,14 +56,14 @@ function UserButton() {
             {isMenuOpen && (
               <div 
                 ref={menuRef}
-                className="absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 z-10 border border-gray-200"
+                className="absolute backdrop-blur-lg right-0 mt-2 w-48 rounded-md shadow-lg z-10 border border-gray-200"
               >
                 <button
                   onClick={() => {
                     navigate("/profile");
                     setIsMenuOpen(false);
                   }}
-                  className="flex items-center w-full px-4 py-2 text-sm text-white hover:text-black hover:bg-gray-100 cursor-pointer"
+                  className="flex items-center w-full px-4 py-2 text-sm text-white rounded-md hover:text-black hover:bg-gray-100 cursor-pointer"
                 >
                   <User className="h-4 w-4 mr-2 text-white"/>
                   Mi Perfil
@@ -73,7 +73,7 @@ function UserButton() {
                     handleLogout();
                     setIsMenuOpen(false);
                   }}
-                  className="flex items-center w-full px-4 py-2 text-sm text-white hover:bg-red-500 cursor-pointer"
+                  className="flex items-center w-full px-4 py-2 text-sm text-white rounded-md hover:bg-red-500 cursor-pointer"
                 >
                   <LogOut className="h-4 w-4 mr-2" />
                   Cerrar Sesión

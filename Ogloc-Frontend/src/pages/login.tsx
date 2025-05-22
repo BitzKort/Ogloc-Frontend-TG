@@ -23,7 +23,6 @@ const Login: React.FC<LoginProps> = ({ toggleForm, valuesLogin, setValuesLogin }
     email: "",
     password: "",
   });
-
   const [touchedEmail, setTouchedEmail] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -32,61 +31,56 @@ const Login: React.FC<LoginProps> = ({ toggleForm, valuesLogin, setValuesLogin }
     const { name, value } = e.target;
     setUserData({ ...userData, [name]: value });
     setValuesLogin({ ...valuesLogin, [name]: value });
+    setError("");
   };
-
 
   const clickToResetPassword = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     navigate('/resetPassword');
   };
- const submitData = async (e: React.FormEvent) => {
-  e.preventDefault();
 
-  if (!userData.email || !userData.password) {
-    alert("Todos los campos son obligatorios");
-    return;
-  }
+  const submitData = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  if (!isValidEmail(userData.email)) {
-    alert("Por favor, ingresa un correo electrónico válido.");
-    return;
-  }
 
-  try {
-    // Construimos el body en formato x-www-form-urlencoded
-    const formData = new URLSearchParams();
-    formData.append("username", userData.email);
-    formData.append("password", userData.password);
-
-    const response = await axios.post(
-      "http://localhost:8000/login",
-      formData,
-      {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      }
-    );
-
-    if (response.status === 200) {
-      // En tu backend devuelves { access_token: "...", token_type: "bearer" }
-      localStorage.setItem("auth", response.data.access_token);
-      navigate("/");
+    if (!userData.email || !userData.password) {
+      setError("Todos los campos son obligatorios");
+      return;
     }
-  } catch (err) {
-    setError("Ocurrió un error al iniciar sesión.");
-    console.error(err);
-  }
-};
 
+    try {
+      const formData = new URLSearchParams();
+      formData.append("username", userData.email);
+      formData.append("password", userData.password);
 
+      const response = await axios.post(
+        "http://localhost:8000/login",
+        formData,
+        { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
+      );
+
+      if (response.status === 200) {
+        localStorage.setItem("auth", response.data.access_token);
+        navigate("/");
+      }
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        if (err.response?.status === 404) {
+          setError(err.response.data.detail || "Usuario no encontrado.");
+        } else {
+          setError("Error al procesar la solicitud.");
+        }
+      } else {
+        setError("Error de conexión.");
+      }
+    }
+  };
 
   const isEmailValid = isValidEmail(userData.email);
   const isFormValid = isEmailValid && userData.password;
 
   return (
-    <div className="flex flex-col justify-center items-center bg-white rounded-2xl shadow-sm shadow-gray-500 p-4">
-      {/* Contenedor con ancho responsive */}
+    <div className="flex flex-col justify-center items-center bg-white rounded-2xl shadow-lg shadow-gray-500 hover:shadow-gray-400/60 p-4">
       <div className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg">
         <img
           src={fondo}
@@ -103,17 +97,22 @@ const Login: React.FC<LoginProps> = ({ toggleForm, valuesLogin, setValuesLogin }
             onChange={catchUserData}
             onBlur={() => setTouchedEmail(true)}
             name="email"
-            value={valuesLogin.email}
+            value={userData.email}
             placeholder="Email"
             className={`bg-[#1C212B] text-white text-sm sm:text-md py-3 px-4 rounded-md w-full ${
               touchedEmail && !isEmailValid ? "border border-red-500" : ""
             }`}
-            required
           />
-
           {touchedEmail && !isEmailValid && (
             <span className="text-red-500 text-xs sm:text-sm">
               Correo electrónico no válido
+            </span>
+          )}
+
+          {/* Mostrar errores genéricos aquí */}
+          {error && (
+            <span className="text-red-500 text-xs sm:text-sm">
+              {error}
             </span>
           )}
 
@@ -121,22 +120,20 @@ const Login: React.FC<LoginProps> = ({ toggleForm, valuesLogin, setValuesLogin }
             onChange={catchUserData}
             name="password"
             type="password"
-            value={valuesLogin.password}
+            value={userData.password}
             placeholder="Contraseña"
             className="bg-[#1C212B] text-white text-sm sm:text-md py-3 px-4 rounded-md w-full"
-            required
           />
 
           <div className="w-full flex justify-end mt-2">
             <button
-              type="submit"
               onClick={submitData}
               disabled={!isFormValid}
-              className={`bg-[#457884] hover:bg-[#3E6973] text-white text-sm md:text-base px-6 md:px-8 py-2 md:py-3 rounded-lg transition-all duration-300 transform hover:scale-105 ${
-              isFormValid
+              className={`${
+                isFormValid
                   ? "bg-[#457884] hover:bg-[#3E6973]"
                   : "bg-gray-400 cursor-not-allowed"
-              }`}
+              } text-white text-sm md:text-base px-6 md:px-8 py-2 md:py-3 rounded-lg transition-all duration-300 transform hover:scale-105`}
             >
               Ingresar
             </button>
@@ -144,11 +141,11 @@ const Login: React.FC<LoginProps> = ({ toggleForm, valuesLogin, setValuesLogin }
 
           <div className="flex flex-col justify-center items-center pt-4 pb-6 gap-3 text-xs sm:text-sm">
             <a
-                  onClick={clickToResetPassword}
-                  className="text-gray-600 hover:text-[#61DECA]"
-                >
-                ¿Olvidaste tu contraseña?
-            </a>   
+              onClick={clickToResetPassword}
+              className="text-gray-600 hover:text-[#61DECA]"
+            >
+              ¿Olvidaste tu contraseña?
+            </a>
 
             <p className="text-gray-600">
               ¿No tienes cuenta?

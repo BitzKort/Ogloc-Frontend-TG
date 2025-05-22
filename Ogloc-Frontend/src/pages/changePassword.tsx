@@ -66,7 +66,7 @@ const changePassword: React.FC<changePasswordProps> = ({ showNavBar = true }) =>
             "http://localhost:8000/reset-password",
             {
                 new_password: password,
-                token: token // Agregar el token al body
+                token: token 
             },
             {
                 headers: {
