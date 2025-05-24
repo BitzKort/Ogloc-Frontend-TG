@@ -1,23 +1,23 @@
 import Ogloc from "../assets/Ogloc logo 2.png"
-import GandalfVerde from "../assets/rana-Ogloc.svg"
-import Gustavf from "../assets/zorro ogloc.png"
+import magicMan from "../assets/rana-Ogloc.svg"
+import Elegant from "../assets/zorro ogloc.png"
 import { motion } from "framer-motion"; 
 import { useNavigate } from "react-router-dom";
 
-const AvatarStoreCard: React.FC = () => {
+const BadgeCard: React.FC = () => {
 
     const images = [
 
         Ogloc,
-        GandalfVerde,
-        Gustavf
+        magicMan,
+        Elegant
     ]
 
     const navigate = useNavigate();
 
     return (
 
-        <div onClick={() => navigate('/store')}
+        <div onClick={() => navigate('/badges')}
             className={` flex flex-col items-center justify-center bg-[#61DECA]/60 w-full py-8 px-4 sm:px-8 md:px-16 lg:px-45 rounded-lg cursor-pointer
                             transition-transform duration-200
                             hover:scale-[1.02]`}
@@ -40,7 +40,7 @@ const AvatarStoreCard: React.FC = () => {
                 
             </div>
 
-            <h1 className="text-xl sm:text-xl md:text-2xl text-center leading-snug"> Consigue puntos de experiencia para cambiar a tu avatar</h1>
+            <h1 className="text-xl sm:text-xl md:text-2xl text-center leading-snug"> Consigue puntos de experiencia para obtener tu insignia.</h1>
 
         </div>
 
@@ -50,4 +50,4 @@ const AvatarStoreCard: React.FC = () => {
 }
 
 
-export default AvatarStoreCard;
+export default BadgeCard;

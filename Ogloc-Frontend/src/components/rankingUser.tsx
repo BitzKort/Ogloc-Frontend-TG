@@ -39,7 +39,7 @@ const RankingUser: React.FC<RankingUserProps> = ({index, player}) => {
       </td>
       <td className="px-4 sm:px-6 py-2 text-right">
         <span className="text-purple-200 text-sm sm:text-base">
-          {player.days} days
+          {player.days} días
         </span>
       </td>
     </tr>

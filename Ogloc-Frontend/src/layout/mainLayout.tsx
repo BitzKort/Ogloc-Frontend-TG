@@ -1,6 +1,5 @@
 import React from "react";
 import Footer from "../components/footer";
-import fondo from '../assets/background login.webp'
 import NavBar from "../components/navBar";
 
 
@@ -14,9 +13,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({children, navBar}) => {
 
     return (
 
-        //style={{ backgroundImage: `url(${fondo})` }}
-
-        <div className="flex flex-col min-h-screen bg-cover bg-center bg-[#2E2E2E]"  style={{ backgroundImage: `url(${fondo})` }}>
+        <div className="flex flex-col min-h-screen bg-[linear-gradient(to_bottom,#aed8dc,#5ba6b8,#2e788f,#1f2a36)]" >
         
         {navBar && <NavBar/>}
 

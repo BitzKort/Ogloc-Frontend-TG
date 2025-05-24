@@ -1,272 +1,268 @@
 import React, { useEffect, useState } from "react";
 import MainLayout from "../layout/mainLayout";
-
-import Pinguin from "../assets/pinguino Ogloc fixed.png";
-
 import { DoorOpen, Mic, Send } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
-
 import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
 interface QuestionPageProps {
-
-    showNavBar: boolean
+    showNavBar: boolean;
 }
 
 interface Question {
-  id: string;
-  title: string;
-  text: string;
-  question_id: string;
-  question_text: string;
-  answer: string;
-  distractor: string;
+    id: string;
+    title: string;
+    text: string;
+    question_id: string;
+    question_text: string;
+    answer: string;
+    distractor: string;
 }
 
 interface QuestionsResponse {
-  questions: Question[];
+    questions: Question[];
 }
 
-interface compare {
+interface Compare {
+    status: string;
+    userId: string;
+    score: string;
+    msg: string;
 
-    sentenceNlp: string
-    sentenceUser: string
-    score: string
 }
 
 const QuestionPage: React.FC<QuestionPageProps> = ({ showNavBar }) => {
-
     const [lesson, setLessons] = useState<Question[]>([]);
     const [question, setQuestion] = useState<Question | null>(null);
-    const [text, setText] = useState<string>(" ");
-    const [correct, setCorrect] = useState<boolean>(false);
+    const [text, setText] = useState<string>("");
     const [loading, setLoading] = useState(true);
+    const [isSent, setIsSent] = useState(false);
+    const [showModal, setShowModal] = useState(false);
+    const [modalMessage, setModalMessage] = useState("");
+    const [error, setError] = useState<string>("");
     const navigate = useNavigate();
     const { lessonId } = useParams<{ lessonId: string }>();
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+    const [compareMsg, setCompareMsg] = useState<string>("");
+    const [compareStatus, setCompareStatus] = useState<string>("");
+
+    useEffect(() => {
+        const fetchLesson = async () => {
+            const token = localStorage.getItem("auth");
+            if (!token) {
+                navigate("/auth");
+                return;
+            }
+            try {
+                const { data, status } = await axios.get<QuestionsResponse>(
+                    "http://localhost:8000/lessons",
+                    { headers: { Authorization: `Bearer ${token}` }, params: { lessonId } }
+                );
+                if (status === 401) {
+                    navigate("/auth");
+                    return;
+                }
+                setLessons(data.questions);
+                setCurrentQuestionIndex(0);
+                setQuestion(data.questions[0] || null);
+
+            } catch (err: any) {
+                setModalMessage(err.response.data.detail);
+                setShowModal(true);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchLesson();
+    }, [lessonId, navigate]);
 
 
-useEffect(() => {
-  const fetchLesson = async () => {
-    const token = localStorage.getItem('auth');
-    if (!token) {
-      console.log('No se encontró token de autenticación');
-      navigate("/auth");
-      return;
-    }
+    const handleNextQuestion = () => {
+        if (lesson && currentQuestionIndex < lesson.length - 1) {
+            setCurrentQuestionIndex(prev => prev + 1);
+            setQuestion(lesson[currentQuestionIndex + 1]);
+            setIsSent(false);
+            setText("");
+            setCompareMsg("");
+            setCompareStatus("");
+        }
+    };
 
-    try {
-      const response = await axios.get<QuestionsResponse>(
-    'http://localhost:8000/lessons',
-    {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-      params: { lessonId },
-    });
-
-      if (response.status === 401) {
-        navigate("/auth");
-        return;
-      }
-
-      setLessons(response.data.questions);
-      if (response.data.questions.length > 0) {
-        setQuestion(response.data.questions[0]);
-      }
-    } catch (err: any) {
-      if (axios.isAxiosError(err) && err.response?.status === 401) {
-        navigate("/auth");
-      } else {
-        console.error("Error al obtener la lección:", err);
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  fetchLesson();
-}, []);
-
-
-    function speechToText() {
-
+    const speechToText = () => {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         const recognition = new SpeechRecognition();
+        recognition.lang = "en-US";
+        recognition.onresult = (e) => setText(e.results[0][0].transcript);
+        recognition.start();
+    };
 
-        recognition.lang = "en-US"
-
-        recognition.onresult = async function (event) {
-            const transcript = event.results[0][0].transcript;
-            setText(transcript);
-        }
-        recognition.start()
-
-    }
-
-
-    async function sendToCompare(answer: string, answerUser: string) {
-
-        console.log(typeof (answer))
-        console.log(typeof (answerUser))
-
+    const sendToCompare = async (answer: string, answerUser: string, question_id: string) => {
+        setError("");
         try {
 
-            const compareRes = await axios.post<compare>("http://localhost:8000/compareResponses",
+            const token = localStorage.getItem('auth');
+            if (!token) return navigate('/auth');
+            const { data } = await axios.post<Compare>(
+                "http://localhost:8000/compareResponses",
                 {
-                    params: {
-                        sentenceNlp: answer,
+                    "lesson_id": lessonId,
+                    "question_id": question_id,
+                    "newExp": 50,
+                    "sentenceNlp": answer,
+                    "sentenceUser": answerUser,
+                    "type": 1
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
                     }
-                })
+                }
 
-            console.log(compareRes.data)
 
-        } catch (error) {
-
-            console.log(error)
+            );
+            setCompareMsg(data.msg);
+            setCompareStatus(data.status);
+            setIsSent(true);
+        } catch (err: any) {
+            setError(err.response?.data?.message || "Error al comparar respuestas");
         }
-
-
-
-    }
+    };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setText(e.target.value);
     };
 
-
     return (
-
         <MainLayout navBar={showNavBar}>
 
-
-            <div className="flex-col min-w-full ">
-
-                <SkeletonTheme baseColor="#202020" highlightColor="#444">
-
-                    <div className=" flex flex-col justify-center items-center ">
-                        <span className=" text-xl font-semibold text-white left-1/2">
-
-                            {loading ? (
-
-                                <Skeleton className="!w-40" />
-
-                            ) : (
-
-                                question?.title
-                            )}
-
-                        </span>
-                        <span className=" text-xl font-semibold text-white left-1/2">
-
-                            {loading ? (
-
-                                <Skeleton className="!w-20" />
-
-                            ) : (
-
-                                "1/2"
-                            )}
-
-                        </span>
-
+            {showModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm">
+                    <div className="bg-white/50 rounded-2xl shadow-xl p-10 max-w-sm">
+                        <h2 className="text-lg mb-4">Aviso</h2>
+                        <p className="mb-6">{modalMessage}</p>
+                        <button
+                            onClick={() => {
+                                setShowModal(false);
+                                navigate("/");
+                            }}
+                            className="px-4 py-2 rounded-lg hover:bg-blue-700 bg-[#61DECA] text-white hover:bg-teal-500"
+                        >
+                            Cerrar
+                        </button>
                     </div>
-
-                    <div className="flex flex-row min-w-full items-center justify-around py-4 px-15">
-
-                        <div className="self-start max-w-xl    text-white  bg-[#444444] rounded-xl p-5">
-
-                            {loading ? (
-
-                                <Skeleton className="!w-80 !h-3 !rounded-xl" count={10} />
-                            ) : (
-
-                                question?.text
+                </div>
+            )}
 
 
-                            )}
+            {!showModal && (
+                <div className=" flex flex-col justify-between items-centerp-4 sm:p-8">
+                    <div className=" justify-between w-full max-w-4xl">
+                        <SkeletonTheme baseColor="#444544" highlightColor="#444">
 
-                        </div>
-
-
-                        <div className="max-w-md flex self-start flex-col p-5 gap-6 rounded-xl bg-[#444444]">
-
-                            <SkeletonTheme baseColor="#0d9488" highlightColor="#61DECA">
-                                <p className="text-white">
-
+                            <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
+                                <h1 className="text-2xl font-bold text-white">
+                                    {loading ? <Skeleton width={200} /> : question?.title}
+                                </h1>
+                                <span className="text-white text-sm sm:text-base">
                                     {loading ? (
-
-                                        <Skeleton className="!w-65 !h-4" count={3} />
+                                        <Skeleton width={50} />
                                     ) : (
-
-                                        question?.question_text
-
-                                        
+                                        `${currentQuestionIndex + 1}/${lesson.length}`
                                     )}
-
-                                </p>
-
-                                <input className="p-5 m-5 border bg-white/70 rounded-xl" placeholder="espacio para la respuesta" onChange={handleChange} value={text}></input>
+                                </span>
+                            </div>
 
 
-                                <div className="flex flex-row justify-between">
+                            <div className=" gap-2 justify-between flex flex-col md:flex-row">
 
-
-                                    <button
-                                        onClick={() => sendToCompare(text, text)}
-                                        className="flex items-center gap-2 px-4 py-2 bg-white/20 text-white rounded-xl hover:bg-[#61DECA]/60  shadow-sm hover:shadow-gray-600"
-                                    >
-                                        <Send className="h-4 w-4" />
-                                        <span>Enviar</span>
-                                    </button>
-
-                                    <button
-                                        onClick={speechToText}
-
-                                        className="flex items-center gap-2 px-4 py-2 bg-white/20 text-white rounded-full hover:text-[#61DECA]/60 shadow-sm hover:shadow-gray-600"
-                                    >
-                                        <Mic className="h-8 w-8" />
-                                    </button>
-
-
+                                <div className="md:w-1/2 bg-[#444544]/50 rounded-xl p-6 text-white">
+                                    {loading ? <Skeleton count={5} /> : question?.text}
                                 </div>
 
 
+                                <div className=" bg-[#444544]/50 rounded-xl p-10">
+                                    <p className="text-white mb-4">
+                                        {loading ? <Skeleton count={3} /> : question?.question_text}
 
-                            </SkeletonTheme>
-                        </div>
 
+
+                                    </p>
+
+                                    {!loading && question && (
+                                        <>
+                                            <ul className="list-decimal list-inside space-y-2 mb-2">
+                                                <li className="text-green-300">{question.answer}</li>
+                                                <li className="text-yellow-300">{question.distractor}</li>
+                                            </ul>
+
+                                            {compareMsg && (
+                                                <p className={`mb-4 ${compareStatus === "success" ? "text-green-400" : "text-red-400"
+                                                    }`}>
+                                                    {compareMsg}
+                                                </p>
+                                            )}
+                                        </>
+                                    )}
+                                    <input
+                                        type="text"
+                                        className="w-full p-3 mb-4 text-sm rounded border border-white/30"
+                                        placeholder="Dale al microfono para escuchar tu respuesta..."
+                                        onChange={handleChange}
+                                        value={text}
+                                        readOnly
+                                    />
+                                    {error && <p className="text-red-400 mb-4">{error}</p>}
+                                    <div className="flex flex-col sm:flex-row sm:justify-between gap-4 mb-4">
+                                        <button
+                                            onClick={() => sendToCompare(question!.answer, text, question!.id)}
+                                            disabled={!text || isSent}
+                                            className={`flex-1 px-4 py-2 rounded-lg
+                                                    ${!text || isSent
+                                                    ? "bg-gray-500 cursor-not-allowed"
+                                                    : "bg-[#61DECA] hover:bg-teal-500"} 
+                                                    text-white`}
+                                        >
+                                            <Send className="inline-block mr-2" />Enviar
+                                        </button>
+                                        <button
+                                            onClick={speechToText}
+                                            className="flex items-center justify-center px-4 py-2 bg-white/20 text-white rounded-full hover:text-[#00FFFF50] hover:bg-white/30"
+                                        >
+                                            <Mic className="h-6 w-6" />
+                                        </button>
+
+                                    </div>
+                                    {lesson && currentQuestionIndex < lesson.length - 1 && (
+                                        <button
+                                            onClick={handleNextQuestion}
+                                            disabled={!isSent}
+                                            className={`mt-4 px-4 py-2 rounded-lg transition-colors ${!isSent
+                                                ? "bg-gray-500 cursor-not-allowed"
+                                                : "bg-[#61DECA] hover:bg-teal-500"
+                                                } text-white`}
+                                        >
+                                            Siguiente
+                                        </button>
+                                    )}
+
+
+                                </div>
+                            </div>
+                            {/* Exit Button */}
+                            <button
+                                onClick={() => navigate("/")}
+                                className="mt-8 w-full sm:w-auto px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                            >
+                                <DoorOpen className="inline-block mr-2" />Salir de la lección
+                            </button>
+                        </SkeletonTheme>
                     </div>
+                </div>
 
-                    <div className=" relative flex items-center p-5 m-10 ">
-                        <img src={Pinguin} className="absolute left-1/3 w-30 object-contain " />
-
-
-                    </div>
-
-                    <button
-                        onClick={() => navigate("/")}
-                        className="flex items-center gap-2 px-4 py-2 bg-white/20 text-white rounded-xl hover:bg-[#FF0000]/60  shadow-sm hover:shadow-gray-600"
-                    >
-                        <DoorOpen className="h-4 w-4" />
-                        <span>Salir de la leccion</span>
-                    </button>
-
-
-                </SkeletonTheme>
-            </div>
-
-
-
+            )}
         </MainLayout>
-
-
-
-
-    )
-}
-
+    );
+};
 
 export default QuestionPage;

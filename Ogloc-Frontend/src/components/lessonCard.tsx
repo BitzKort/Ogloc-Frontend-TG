@@ -19,11 +19,11 @@ const LessonCard: React.FC<LessonCardProps> = ({id, title, questions}) => {
 
         <div className=" flex flex-col bg-white/50 w-60 h-40 items-center justify-between mx-2 py-6 rounded-lg" onClick={() => {navigate(`/question/${id}`)}}>
 
-                <h1 className="font-semibold text-lg"> {title} </h1>
+                <span className="font-semibold text-center text-lg"> {title} </span>
 
                 <div className="flex flex-row min-w-full pr-4 justify-end">
 
-                    <h2 className="italic"> {questions} preguntas</h2>
+                    <span className="italic"> {questions} preguntas</span>
 
                 </div>
                 

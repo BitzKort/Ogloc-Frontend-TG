@@ -36,7 +36,7 @@ const Register: React.FC<RegisterProps> = ({ toggleForm, valuesRegister, setValu
     const [error, setError] = useState<string | null>(null);
     
     const navigate = useNavigate();
-    +
+    
 
         // Validaciones individuales
         useEffect(() => {
@@ -106,14 +106,21 @@ const Register: React.FC<RegisterProps> = ({ toggleForm, valuesRegister, setValu
         }
 
         });
-            if (response.status === 200) resetAndToggle();
+
+            if (response.status === 200){
+
+                localStorage.setItem("auth", response.data.access_token);
+                navigate("/");
+
+            }
+
         } 
         catch (err) {
       if (axios.isAxiosError(err)) {
         if (err.response?.status === 406) {
           setError(err.response.data.detail || "Error al registrar usuario.");
         } else {
-          setError("Error al procesar la solicitud.");
+          setError(err.response?.data.detail);
         }
       } else {
         setError("Error de conexión.");
@@ -126,8 +133,11 @@ const Register: React.FC<RegisterProps> = ({ toggleForm, valuesRegister, setValu
             <div className="w-full max-w-2xl bg-white rounded-2xl shadow-lg shadow-gray-500 p-6">
                 <div className="flex flex-col md:flex-row justify-center items-center gap-4 mb-2">
                     <img src={avatar} className="w-16 md:w-24" alt="Avatar" />
-                    <h1 className="text-xl font-semibold">Crea tu cuenta y comienza a ganar XP</h1>
-                    {error && <p className="text-red-500 text-xs">{error}</p>}
+                    <div className=" flex flex-col justify-center items-center">
+                        <h1 className="text-xl font-semibold">Crea tu cuenta y comienza a ganar XP</h1>
+                        {error && <p className="text-red-500 text-xs">{error}</p>}
+                    </div>
+                    
                         
                 </div>
                 <form onSubmit={handleSubmit} className="space-y-4">

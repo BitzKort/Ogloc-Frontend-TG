@@ -63,7 +63,6 @@ useEffect(() => {
         config
       );
 
-      console.log(userInfoRes.data)
       setUserInfo(userInfoRes.data);
     } catch (error) {
       console.error('Error al obtener userInfo:', error);
@@ -76,10 +75,9 @@ useEffect(() => {
 }, []);
 
 
-
     return (
         <div className="flex flex-row justify-between items-center px-4 md:px-8 py-3 shadow-md shadow-gray-500">
-            <SkeletonTheme baseColor="#202020" highlightColor="#444">
+            <SkeletonTheme baseColor="#2e788f" highlightColor="#444">
                 {/* Logo y título */}
                 <div className="flex items-center cursor-pointer" onClick={() => navigate("/")}>
                     <img
@@ -92,7 +90,7 @@ useEffect(() => {
                     </h1>
                 </div>
 
-                {/* Stats - Versión desktop */}
+             
                 <div className="hidden md:flex gap-6 items-center">
                     <div className="flex items-center gap-2">
                         <Activity className="text-yellow-500" />
@@ -116,7 +114,7 @@ useEffect(() => {
                     </div>
                 </div>
 
-                {/* Stats - Versión md*/}
+              
                 <div className="md:hidden my-2">
 
                     <ul className="p-1 backdrop-blur-sm shadow-lg shadow-gray-500 rounded-lg w-full">
@@ -144,12 +142,12 @@ useEffect(() => {
                     </ul>
                 </div>
 
-                {/* User Info */}
+               
                 <div className="flex items-center gap-3 md:gap-5">
                     <span className="hidden md:inline text-white text-sm md:text-lg truncate max-w-[120px] lg:max-w-[200px]">
                         {loading ? <Skeleton width={70} /> : userInfo?.username}
                     </span>
-                    <UserButton />
+                    <UserButton userData={userInfo} setBadge= {loading}/>
                 </div>
             </SkeletonTheme>
         </div>

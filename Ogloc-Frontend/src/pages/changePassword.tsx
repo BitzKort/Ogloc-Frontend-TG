@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import MainLayout from "../layout/mainLayout";
 import { ArrowRight, Lock, EyeOff, Eye} from "lucide-react";
 import axios from "axios";
-
+import { useNavigate } from "react-router-dom";
 interface changePasswordProps {
   showNavBar?: boolean;
 }
@@ -20,7 +20,8 @@ const changePassword: React.FC<changePasswordProps> = ({ showNavBar = true }) =>
     const [token, setToken] = useState("");
     const [tokenError, setTokenError] = useState("");
 
-
+    const navigate = useNavigate();
+    
     // Regex: Al menos 8 caracteres, una mayúscula, una minúscula y un número
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
 
@@ -65,13 +66,14 @@ const changePassword: React.FC<changePasswordProps> = ({ showNavBar = true }) =>
         const response = await axios.put(
             "http://localhost:8000/reset-password",
             {
-                new_password: password,
-                token: token 
+                token: token,
+                newPassword: password 
             },
             {
-                headers: {
-                    "Content-Type": "application/json"
-                }
+            headers: { 
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json' 
+                    }
             }
         );
 
@@ -79,11 +81,13 @@ const changePassword: React.FC<changePasswordProps> = ({ showNavBar = true }) =>
                 alert("¡Contraseña actualizada con éxito!");
                 setPassword("");
                 setConfirmPassword("");
+                navigate("/auth");
+
             }
 
         } catch (error) {
             if (axios.isAxiosError(error)) {
-                if (error.response?.status === 400) {
+                if (error.response?.status === 401) {
                     // Manejar error de token inválido
                     if (error.response.data.detail?.includes("token")) {
                         setTokenError("Token inválido o expirado");

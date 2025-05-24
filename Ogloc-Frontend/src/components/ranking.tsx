@@ -24,17 +24,19 @@ const Ranking: React.FC<RankingProps> = ({players, loading}) => {
     
     return (
   <div
-      className="w-full max-w-lg bg-gradient-to-br from-teal-600 to-[#61DECA]/60 rounded-lg mx-auto p-2"
-    >
+    className="bg-gradient-to-br from-teal-600 to-[#61DECA]/60 rounded-lg mx-auto p-2 w-full sm:w-11/12 md:w-3/4 lg:w-2/3 xl:w-1/2 2xl:max-w-screen-lg"
+    
+     >
+    
       <div
         className="bg-white/10 backdrop-blur-lg rounded-2xl shadow-xl overflow-hidden"
       >
         <div className="px-6 py-4 text-center">
           <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1">
-            Player Rankings
+            Clasificación de jugadores.
           </h1>
           <p className="text-sm sm:text-base text-white">
-            Top Players Leaderboard
+            Top 10 Jugadores.
           </p>
         </div>
 
@@ -44,7 +46,7 @@ const Ranking: React.FC<RankingProps> = ({players, loading}) => {
               <thead>
                 <tr className="bg-cyan-950/50">
                   <th className="px-4 py-3 text-left text-sm ">
-                    Rank
+                    N°
                   </th>
                   <th className="px-4 py-3 text-left text-sm ">
                     Username
@@ -53,7 +55,7 @@ const Ranking: React.FC<RankingProps> = ({players, loading}) => {
                     EXP
                   </th>
                   <th className="px-4 py-3 text-right text-sm">
-                    Days Active
+                    Días racha.
                   </th>
                 </tr>
               </thead>

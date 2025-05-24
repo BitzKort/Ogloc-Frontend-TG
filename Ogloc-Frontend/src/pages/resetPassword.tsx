@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import MainLayout from "../layout/mainLayout";
-import { ArrowRight, Mail } from "lucide-react";
+import { ArrowRight,ArrowLeft, Mail } from "lucide-react";
 import axios from "axios";
-
+import { useNavigate } from "react-router-dom";
 
 
 interface ForgotPasswordProps {
@@ -17,6 +17,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ showNavBar = true }) =>
     const [error, setError] = useState("");
     const [emailFormatError, setEmailFormatError] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const navigate = useNavigate();
 
     const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,}$/;
 
@@ -42,7 +43,6 @@ const handleSubmit = async (e: React.FormEvent) => {
     }
     
     setIsSubmitting(true);
-    console.log(email)
 
     const trimmedEmail = email.trim()
 
@@ -73,7 +73,6 @@ const handleSubmit = async (e: React.FormEvent) => {
     } catch (error) {
         if (axios.isAxiosError(error)) {
             if (error.response?.status === 404) {
-                console.log(error.response)
                 // Usamos el mensaje del servidor o uno por defecto
                 setError(error.response.data.detail || "Error en la solicitud");
             } else {
@@ -148,7 +147,19 @@ const handleSubmit = async (e: React.FormEvent) => {
                 </div>
                 )}
 
-                <div className="w-full flex justify-end mt-6">
+                <div className="w-full flex justify-between gap-4 mt-6">
+
+                <button
+                    onClick={() => navigate(-1)}
+                    className={`flex items-center gap-1 bg-[#457884] hover:bg-[#3E6973] text-white font-medium py-2.5 px-2 rounded-lg transition-all duration-300 ${
+                    isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+                    }`}
+                >
+                   <ArrowLeft className="h-4 w-4"/>
+                    Volver
+                    
+                </button>   
+
                 <button
                     type="submit"
                     disabled={isSubmitting}
@@ -158,7 +169,10 @@ const handleSubmit = async (e: React.FormEvent) => {
                 >
                     {isSubmitting ? "Enviando..." : "Recuperar"}
                     {!isSubmitting && <ArrowRight className="h-4 w-4" />}
+                    
                 </button>
+
+
                 </div>
             </form>
             </div>

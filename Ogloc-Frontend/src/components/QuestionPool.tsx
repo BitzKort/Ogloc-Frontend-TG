@@ -10,7 +10,7 @@ const QuestionPool: React.FC = () => {
 
     return (
 <div
-      onClick={() => navigate('/question')}
+      onClick={() => navigate('/incorrectQuestion')}
       className={` flex flex-col items-center justify-center bg-[#61DECA]/60 w-full py-8 px-4 sm:px-8 md:px-16 lg:px-60 rounded-lg cursor-pointer
                     transition-transform duration-200
                     hover:scale-[1.02]`}
@@ -24,7 +24,7 @@ const QuestionPool: React.FC = () => {
         Gana experiencia resolviendo
       </h1>
       <h1 className="text-xl sm:text-xl md:text-2xl text-center leading-snug">
-        las preguntas que has fallado en los módulos
+        las preguntas que has fallado en las Lecciones
       </h1>
     </div>
   );
