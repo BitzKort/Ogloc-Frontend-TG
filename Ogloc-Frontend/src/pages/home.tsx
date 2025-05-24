@@ -95,14 +95,13 @@ const Home: React.FC<HomeProps> = ({ showNavBar }) => {
           axios.get<Lessons>("http://localhost:8000/AllLessons", config),
         ]);
 
-        console.log(lessonsRes.data)
         // 4. Guarda resultados en el estado
         setLessons(lessonsRes.data);
         setPlayer(rankingRes.data);
         setLoading(false);
       } catch (error) {
         setError((error as Error).message);
-        console.error(error);
+
       }
     };
 

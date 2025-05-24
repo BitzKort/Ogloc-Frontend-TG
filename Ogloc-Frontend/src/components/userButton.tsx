@@ -52,7 +52,7 @@ const UserButton:React.FC<UserButtonProps> = ({userData, setBadge}) => {
   }, []);
 
   const handleLogout = () => {
-    // Add logout logic here
+
     localStorage.removeItem('auth');
     navigate("/Auth")
   };

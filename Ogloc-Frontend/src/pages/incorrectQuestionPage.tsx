@@ -11,7 +11,7 @@ interface IncorrectQuestionPageProps {
 }
 
 interface Question {
-    id: string;
+    lesson_id: string;
     title: string;
     text: string;
     question_id: string;
@@ -20,9 +20,6 @@ interface Question {
     distractor: string;
 }
 
-interface QuestionsResponse {
-    questions: Question[];
-}
 
 interface Compare {
     status: string;
@@ -38,11 +35,10 @@ const IncorrectQuestionPage: React.FC<IncorrectQuestionPageProps> = ({ showNavBa
     const [text, setText] = useState<string>("");
     const [loading, setLoading] = useState(true);
     const [isSent, setIsSent] = useState(false);
-    const [error, setError] = useState<string>("");
+    const [isFetchingNext, setIsFetchingNext] = useState(false);
     const [showModal, setShowModal] = useState(false);
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const [showNext, setShowNext] = useState(false);
     const [modalMessage, setModalMessage] = useState("");
+    const [error, setError] = useState<string>("");
     const navigate = useNavigate();
     const { lessonId } = useParams<{ lessonId: string }>();
     const [compareMsg, setCompareMsg] = useState<string>("");
@@ -57,39 +53,107 @@ const IncorrectQuestionPage: React.FC<IncorrectQuestionPageProps> = ({ showNavBa
             }
 
             try {
-                const resp = await axios.get<any>(
+                const { data } = await axios.get<any>(
                     "http://localhost:8000/failedQuestions",
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
-                const data = resp.data;
-
-                // 1) Si el servidor te devuelve solo { detail: ... }
-                if (data.detail) {
-                    setModalMessage("No tienes preguntas incorrectas.");
+                console.log(data)
+                // Caso 1: Respuesta con preguntas
+                if (data.question_id) {
+                    // Convertimos el objeto individual en un array
+                    setLessons([data]);
+                    setQuestion(data);
+                }
+                // Caso 2: Respuesta sin preguntas
+                else if (data.detail) {
+                    setModalMessage(data.detail);
                     setShowModal(true);
-                     return;
+                    setLessons([]);
+                    setQuestion(null);
+                }
+                // Caso 3: Respuesta inesperada
+                else {
+                    setModalMessage('Formato de respuesta no reconocido');
+                    setShowModal(true);
+                    setLessons([]);
+                    setQuestion(null);
                 }
 
-                // 2) Si llegó el array de preguntas:
-                if (Array.isArray(data.questions) && data.questions.length > 0) {
-                    setLessons(data.questions);
-                    setQuestion(data.questions[0]);
-                } else {
-                    // (por si acaso vienen {} o questions vacío)
-                    navigate("/");
-                }
             } catch (err: any) {
-                console.error(err);
-                setModalMessage("Error al cargar las preguntas.");
+                const errorMessage = err.response?.data?.detail ||
+                    err.message ||
+                    "Error al obtener preguntas";
+                setModalMessage(errorMessage);
                 setShowModal(true);
+                setLessons([]);
+                setQuestion(null);
             } finally {
                 setLoading(false);
             }
         };
-
         fetchLesson();
     }, [lessonId, navigate]);
 
+
+    const handleNextQuestion = async () => {
+
+
+        setIsSent(false);
+        setText("");
+        setCompareMsg("");
+        setCompareStatus("");
+        setCompareStatus("");
+        setLoading(true);
+        setQuestion(null);
+
+
+        setIsFetchingNext(true);
+
+        const token = localStorage.getItem("auth");
+        if (!token) {
+            navigate("/auth");
+            return;
+        }
+
+        try {
+            const { data } = await axios.get<any>(
+                "http://localhost:8000/failedQuestions",
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            console.log(data)
+            if (data.question_id) {
+
+                setLessons([data]);
+                setQuestion(data);
+            }
+            // Caso 2: Respuesta sin preguntas
+            else if (data.detail) {
+                setModalMessage(data.detail);
+                setShowModal(true);
+                setLessons([]);
+                setQuestion(null);
+            }
+            // Caso 3: Respuesta inesperada
+            else {
+                setModalMessage('Formato de respuesta no reconocido');
+                setShowModal(true);
+                setLessons([]);
+                setQuestion(null);
+            }
+
+        } catch (err: any) {
+            const errorMessage = err.response?.data?.detail ||
+                err.message ||
+                "Error al obtener preguntas";
+            setModalMessage(errorMessage);
+            setShowModal(true);
+            setLessons([]);
+            setQuestion(null);
+        } finally {
+            setIsFetchingNext(false);
+            setLoading(false);
+        }
+    };
 
     const speechToText = () => {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -99,7 +163,7 @@ const IncorrectQuestionPage: React.FC<IncorrectQuestionPageProps> = ({ showNavBa
         recognition.start();
     };
 
-    const sendToCompare = async (answer: string, answerUser: string, question_id: string) => {
+    const sendToCompare = async (answer: string, answerUser: string, lesson_id: string, question_id: string) => {
         setError("");
         try {
 
@@ -108,9 +172,9 @@ const IncorrectQuestionPage: React.FC<IncorrectQuestionPageProps> = ({ showNavBa
             const { data } = await axios.post<Compare>(
                 "http://localhost:8000/compareResponses",
                 {
-                    "lesson_id": lessonId,
+                    "lesson_id": lesson_id,
                     "question_id": question_id,
-                    "newExp": 5,
+                    "newExp": 30,
                     "sentenceNlp": answer,
                     "sentenceUser": answerUser,
                     "type": 2
@@ -140,7 +204,7 @@ const IncorrectQuestionPage: React.FC<IncorrectQuestionPageProps> = ({ showNavBa
 
             {showModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm">
-                    <div className="bg-white/50 rounded-2xl shadow-xl p-6 max-w-sm">
+                    <div className="bg-white/50 rounded-2xl shadow-xl p-10 max-w-sm">
                         <h2 className="text-lg mb-4">Aviso</h2>
                         <p className="mb-6">{modalMessage}</p>
                         <button
@@ -156,94 +220,115 @@ const IncorrectQuestionPage: React.FC<IncorrectQuestionPageProps> = ({ showNavBa
                 </div>
             )}
 
-            {!showModal && (
-            <div className=" flex flex-col justify-between items-centerp-4 sm:p-8">
-                <div className=" justify-between w-full max-w-4xl">
-                    <SkeletonTheme baseColor="#202020" highlightColor="#444">
-                        {/* Title and Progress */}
-                        <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
-                            <h1 className="text-2xl font-bold text-white">
-                                {loading ? <Skeleton width={200} /> : question?.title}
-                            </h1>
-                            <span className="text-white text-sm sm:text-base">
-                                {loading ? <Skeleton width={50} /> : `1/${lesson.length || 1}`}
-                            </span>
-                        </div>
 
-                        {/* Responsive Layout: Text left, QA right on md+ */}
-                        <div className=" gap-2 justify-between flex flex-col md:flex-row">
-                            {/* Text Section */}
-                            <div className="md:w-1/2 bg-[#444444] rounded-xl p-6 text-white">
-                                {loading ? <Skeleton count={5} /> : question?.text}
+            {!showModal && (
+                <div className=" flex flex-col justify-between items-centerp-4 sm:p-8">
+                    <div className=" justify-between w-full max-w-4xl">
+                        <SkeletonTheme baseColor="#444544" highlightColor="#444">
+
+                            <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
+                                <h1 className="text-2xl font-bold text-white">
+                                    {loading ? <Skeleton width={200} /> : question?.title}
+                                </h1>
                             </div>
 
 
-                            <div className="border bg-[#444444] rounded-xl p-10">
-                                <p className="text-white mb-4">
-                                    {loading ? <Skeleton count={3} /> : question?.question_text}
+                            <div className=" gap-2 justify-between flex flex-col md:flex-row">
 
-
-
-                                </p>
-
-                                {!loading && question && (
-                                    <>
-                                        <ul className="list-decimal list-inside space-y-2 mb-2">
-                                            <li className="text-green-300">{question.answer}</li>
-                                            <li className="text-yellow-300">{question.distractor}</li>
-                                        </ul>
-
-                                        {compareMsg && (
-                                            <p className={`mb-4 ${compareStatus === "success" ? "text-green-400" : "text-red-400"
-                                                }`}>
-                                                {compareMsg}
-                                            </p>
-                                        )}
-                                    </>
-                                )}
-                                <input
-                                    type="text"
-                                    className="w-full p-3 mb-4 text-sm rounded border border-white/30"
-                                    placeholder="Dale al microfono para escuchar tu respuesta..."
-                                    onChange={handleChange}
-                                    value={text}
-                                    readOnly
-                                />
-                                {error && <p className="text-red-400 mb-4">{error}</p>}
-                                <div className="flex flex-col sm:flex-row sm:justify-between gap-4 mb-4">
-                                    <button
-                                        onClick={() => sendToCompare(question!.answer, text, question!.id)}
-                                        disabled={!text || isSent}
-                                        className={`flex-1 px-4 py-2 rounded-lg
-                                                    ${!text || isSent
-                                                ? "bg-gray-500 cursor-not-allowed"
-                                                : "bg-[#61DECA] hover:bg-teal-500"} 
-                                                    text-white`}
-                                    >
-                                        <Send className="inline-block mr-2" />Enviar
-                                    </button>
-                                    <button
-                                        onClick={speechToText}
-                                        className="flex items-center justify-center px-4 py-2 bg-white/20 text-white rounded-full hover:bg-white/30"
-                                    >
-                                        <Mic className="h-6 w-6" />
-                                    </button>
+                                <div className="md:w-1/2 bg-[#444544]/50 rounded-xl p-6 text-white">
+                                    {loading ? <Skeleton count={5} /> : question?.text}
                                 </div>
 
-                            </div>
-                        </div>
-                        {/* Exit Button */}
-                        <button
-                            onClick={() => navigate("/")}
-                            className="mt-8 w-full sm:w-auto px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-                        >
-                            <DoorOpen className="inline-block mr-2" />Salir de la lección
-                        </button>
-                    </SkeletonTheme>
-                </div>
-            </div>
 
-        )}
+                                <div className=" bg-[#444544]/50 rounded-xl p-10">
+                                    <p className="text-white mb-4">
+                                        {loading ? <Skeleton count={3} /> : question?.question_text}
+
+
+
+                                    </p>
+
+                                    {!loading && question && (
+                                        <>
+                                            <ul className="list-decimal list-inside space-y-2 mb-2">
+                                                <li className="text-green-300">{question.answer}</li>
+                                                <li className="text-yellow-300">{question.distractor}</li>
+                                            </ul>
+
+                                            {compareMsg && (
+                                                <p className={`mb-4 ${compareStatus === "success" ? "text-green-400" : "text-red-400"
+                                                    }`}>
+                                                    {compareMsg}
+                                                </p>
+                                            )}
+                                        </>
+                                    )}
+                                    <input
+                                        type="text"
+                                        className="w-full p-3 mb-4 text-sm rounded border border-white/30"
+                                        placeholder="Dale al microfono para escuchar tu respuesta..."
+                                        onChange={handleChange}
+                                        value={text}
+                                        readOnly
+                                    />
+                                    {error && <p className="text-red-400 mb-4">{error}</p>}
+                                    <div className="flex flex-col sm:flex-row sm:justify-between gap-4 mb-4">
+                                        <button
+                                            onClick={() => sendToCompare(question!.answer, text, question!.lesson_id, question!.question_id)}
+                                            disabled={!text || isSent}
+                                            className={`flex-1 px-4 py-2 rounded-lg
+                                                    ${!text || isSent
+                                                    ? "bg-gray-500 cursor-not-allowed"
+                                                    : "bg-[#61DECA] hover:bg-teal-500"} 
+                                                    text-white`}
+                                        >
+                                            <Send className="inline-block mr-2" />Enviar
+                                        </button>
+                                        <button
+                                            onClick={speechToText}
+                                            disabled={isSent}
+                                            className={`flex items-center justify-center px-4 py-2 
+    
+                                                ${isSent
+                                                    ? "bg-gray-500 cursor-not-allowed"
+                                                    : " bg-white/30 hover:text-[#00FFFF50]"}
+                                                
+                                                text-white rounded-full`}                                        >
+                                            <Mic className="h-6 w-6" />
+                                        </button>
+
+                                    </div>
+
+                                    <button
+                                        onClick={handleNextQuestion}
+                                        disabled={!isSent || isFetchingNext}
+                                        className={`mt-4 px-4 py-2 rounded-lg transition-colors ${!isSent || isFetchingNext
+                                                ? "bg-gray-500 cursor-not-allowed"
+                                                : "bg-[#61DECA] hover:bg-teal-500"
+                                            } text-white`}
+                                    >
+                                        {isFetchingNext ? (
+                                            'Buscando...'
+                                        ) : (
+                                            'Siguiente'
+                                        )}
+                                    </button>
+
+
+                                </div>
+                            </div>
+                            {/* Exit Button */}
+                            <button
+                                onClick={() => navigate("/")}
+                                className="mt-8 w-full sm:w-auto px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                            >
+                                <DoorOpen className="inline-block mr-2" />Salir de la lección
+                            </button>
+                        </SkeletonTheme>
+                    </div>
+                </div>
+
+            )}
         </MainLayout>
     );
 };

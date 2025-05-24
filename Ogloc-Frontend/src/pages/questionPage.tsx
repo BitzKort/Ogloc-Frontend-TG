@@ -11,7 +11,7 @@ interface QuestionPageProps {
 }
 
 interface Question {
-    id: string;
+    lesson_id: string;
     title: string;
     text: string;
     question_id: string;
@@ -46,6 +46,8 @@ const QuestionPage: React.FC<QuestionPageProps> = ({ showNavBar }) => {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [compareMsg, setCompareMsg] = useState<string>("");
     const [compareStatus, setCompareStatus] = useState<string>("");
+    const [showExitConfirmation, setShowExitConfirmation] = useState(false);
+
 
     useEffect(() => {
         const fetchLesson = async () => {
@@ -60,10 +62,13 @@ const QuestionPage: React.FC<QuestionPageProps> = ({ showNavBar }) => {
                     { headers: { Authorization: `Bearer ${token}` }, params: { lessonId } }
                 );
                 if (status === 401) {
+                    localStorage.removeItem('auth');
                     navigate("/auth");
                     return;
                 }
                 setLessons(data.questions);
+                console.log(data.questions[0])
+                console.log(data)
                 setCurrentQuestionIndex(0);
                 setQuestion(data.questions[0] || null);
 
@@ -119,8 +124,8 @@ const QuestionPage: React.FC<QuestionPageProps> = ({ showNavBar }) => {
                     }
                 }
 
-
             );
+            console.log(data)
             setCompareMsg(data.msg);
             setCompareStatus(data.status);
             setIsSent(true);
@@ -215,7 +220,7 @@ const QuestionPage: React.FC<QuestionPageProps> = ({ showNavBar }) => {
                                     {error && <p className="text-red-400 mb-4">{error}</p>}
                                     <div className="flex flex-col sm:flex-row sm:justify-between gap-4 mb-4">
                                         <button
-                                            onClick={() => sendToCompare(question!.answer, text, question!.id)}
+                                            onClick={() => sendToCompare(question!.answer, text, question!.question_id)}
                                             disabled={!text || isSent}
                                             className={`flex-1 px-4 py-2 rounded-lg
                                                     ${!text || isSent
@@ -227,7 +232,14 @@ const QuestionPage: React.FC<QuestionPageProps> = ({ showNavBar }) => {
                                         </button>
                                         <button
                                             onClick={speechToText}
-                                            className="flex items-center justify-center px-4 py-2 bg-white/20 text-white rounded-full hover:text-[#00FFFF50] hover:bg-white/30"
+                                            disabled={isSent}
+                                            className={`flex items-center justify-center px-4 py-2 
+    
+                                                ${isSent
+                                                    ? "bg-gray-500 cursor-not-allowed"
+                                                    : " bg-white/30 hover:text-[#00FFFF50]"}
+                                                
+                                                text-white rounded-full`}
                                         >
                                             <Mic className="h-6 w-6" />
                                         </button>
@@ -249,13 +261,37 @@ const QuestionPage: React.FC<QuestionPageProps> = ({ showNavBar }) => {
 
                                 </div>
                             </div>
-                            {/* Exit Button */}
+
                             <button
-                                onClick={() => navigate("/")}
+                                onClick={() => setShowExitConfirmation(true)}
                                 className="mt-8 w-full sm:w-auto px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
                             >
                                 <DoorOpen className="inline-block mr-2" />Salir de la lección
                             </button>
+
+
+                            {showExitConfirmation && (
+                                <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm">
+                                    <div className="bg-white/50 rounded-2xl shadow-xl p-10 max-w-sm">
+                                        <h2 className="text-lg mb-4">Salir de la leccion</h2>
+                                        <p className="mb-6">¿Estás seguro que quieres abandonar la lección? Si ya respondiste al menos una pregunta no podras volver a entrar a la leccion.</p>
+                                        <div className="flex gap-4 justify-end">
+                                            <button
+                                                onClick={() => setShowExitConfirmation(false)}
+                                                className="px-4 py-2 rounded-lg bg-gray-500 text-white hover:bg-gray-600"
+                                            >
+                                                Cancelar
+                                            </button>
+                                            <button
+                                                onClick={() => navigate("/")}
+                                                className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700"
+                                            >
+                                                Salir
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                         </SkeletonTheme>
                     </div>
                 </div>
