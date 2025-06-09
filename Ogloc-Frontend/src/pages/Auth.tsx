@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import MainLayout from "../layout/mainLayout";
 import Login from "./login";
 import Register from "./register";
-
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 interface AuthProps {
 
@@ -18,6 +19,37 @@ const Auth: React.FC<AuthProps> = ({ showNavBar }) => {
     const [valuesLogin, setValuesLogin] = useState({ email: "", password: "" });
 
     const [valuesRegister, setValuesRegister] = useState({ name: "", username: "", email: "", password: "" });
+
+    const navigate = useNavigate();
+
+
+    useEffect(() => {
+        const verifyToken = async () => {
+            const token = localStorage.getItem("auth");
+
+            if (!token) return;
+
+            try {
+                await axios.get("http://localhost:8000/verifyToken", {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+
+                navigate("/");
+            } catch (error) {
+                console.error(error)
+                if (axios.isAxiosError(error) && error.response?.status === 401) {
+                    localStorage.removeItem("auth");
+                    alert("Inicia sesión nuevamente");
+                    navigate("/auth");
+                }
+            }
+        };
+
+        verifyToken();
+    }, [navigate]);
+
 
     const toggleForm = () => {
 

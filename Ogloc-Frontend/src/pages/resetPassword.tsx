@@ -73,7 +73,7 @@ const handleSubmit = async (e: React.FormEvent) => {
     } catch (error) {
         if (axios.isAxiosError(error)) {
             if (error.response?.status === 404) {
-                // Usamos el mensaje del servidor o uno por defecto
+              
                 setError(error.response.data.detail || "Error en la solicitud");
             } else {
                 setError("Error al procesar la solicitud");

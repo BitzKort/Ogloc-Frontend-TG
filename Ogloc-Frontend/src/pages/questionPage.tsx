@@ -37,11 +37,13 @@ const QuestionPage: React.FC<QuestionPageProps> = ({ showNavBar }) => {
     const [question, setQuestion] = useState<Question | null>(null);
     const [text, setText] = useState<string>("");
     const [loading, setLoading] = useState(true);
+    const [buttonState, setButtonState] = useState<'send' | 'sending' | 'sent'>('send');;
     const [isSent, setIsSent] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [modalMessage, setModalMessage] = useState("");
     const [error, setError] = useState<string>("");
     const navigate = useNavigate();
+    const [micClickCount, setMicClickCount] = useState(0);
     const { lessonId } = useParams<{ lessonId: string }>();
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [compareMsg, setCompareMsg] = useState<string>("");
@@ -73,6 +75,10 @@ const QuestionPage: React.FC<QuestionPageProps> = ({ showNavBar }) => {
                 setQuestion(data.questions[0] || null);
 
             } catch (err: any) {
+                if (axios.isAxiosError(error) && error.response?.status === 401) {
+                    localStorage.removeItem('auth');
+                    navigate("auth");
+                }
                 setModalMessage(err.response.data.detail);
                 setShowModal(true);
             } finally {
@@ -88,6 +94,7 @@ const QuestionPage: React.FC<QuestionPageProps> = ({ showNavBar }) => {
             setCurrentQuestionIndex(prev => prev + 1);
             setQuestion(lesson[currentQuestionIndex + 1]);
             setIsSent(false);
+            setButtonState('send');
             setText("");
             setCompareMsg("");
             setCompareStatus("");
@@ -95,6 +102,7 @@ const QuestionPage: React.FC<QuestionPageProps> = ({ showNavBar }) => {
     };
 
     const speechToText = () => {
+        setMicClickCount(prev => prev + 1);
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         const recognition = new SpeechRecognition();
         recognition.lang = "en-US";
@@ -104,6 +112,7 @@ const QuestionPage: React.FC<QuestionPageProps> = ({ showNavBar }) => {
 
     const sendToCompare = async (answer: string, answerUser: string, question_id: string) => {
         setError("");
+        setButtonState('sending');
         try {
 
             const token = localStorage.getItem('auth');
@@ -126,10 +135,16 @@ const QuestionPage: React.FC<QuestionPageProps> = ({ showNavBar }) => {
 
             );
             console.log(data)
+            setMicClickCount(0)
             setCompareMsg(data.msg);
             setCompareStatus(data.status);
             setIsSent(true);
+            setButtonState('sent');
         } catch (err: any) {
+            if (axios.isAxiosError(error) && error.response?.status === 401) {
+                localStorage.removeItem('auth');
+                navigate("auth");
+            }
             setError(err.response?.data?.message || "Error al comparar respuestas");
         }
     };
@@ -168,7 +183,9 @@ const QuestionPage: React.FC<QuestionPageProps> = ({ showNavBar }) => {
                             <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
                                 <h1 className="text-2xl font-bold text-white">
                                     {loading ? <Skeleton width={200} /> : question?.title}
+                                    <p className="text-sm text-yellow-300">50 exp</p>
                                 </h1>
+
                                 <span className="text-white text-sm sm:text-base">
                                     {loading ? (
                                         <Skeleton width={50} />
@@ -197,8 +214,8 @@ const QuestionPage: React.FC<QuestionPageProps> = ({ showNavBar }) => {
                                     {!loading && question && (
                                         <>
                                             <ul className="list-decimal list-inside space-y-2 mb-2">
-                                                <li className="text-green-300">{question.answer}</li>
-                                                <li className="text-yellow-300">{question.distractor}</li>
+                                                <li className="text-sm text-white">{question.answer}</li>
+                                                <li className="text-sm text-white">{question.distractor}</li>
                                             </ul>
 
                                             {compareMsg && (
@@ -211,24 +228,33 @@ const QuestionPage: React.FC<QuestionPageProps> = ({ showNavBar }) => {
                                     )}
                                     <input
                                         type="text"
-                                        className="w-full p-3 mb-4 text-sm rounded border border-white/30"
+                                        className={`w-full p-3 mb-4 text-sm rounded border border-white/30 ${micClickCount < 3
+                                            ? "bg-gray-500"
+                                            : "bg-white/20"
+                                            }`}
                                         placeholder="Dale al microfono para escuchar tu respuesta..."
                                         onChange={handleChange}
                                         value={text}
-                                        readOnly
+                                        readOnly={micClickCount < 3}
                                     />
                                     {error && <p className="text-red-400 mb-4">{error}</p>}
                                     <div className="flex flex-col sm:flex-row sm:justify-between gap-4 mb-4">
                                         <button
                                             onClick={() => sendToCompare(question!.answer, text, question!.question_id)}
-                                            disabled={!text || isSent}
+                                            disabled={!text || buttonState === 'sending' || buttonState === 'sent'}
                                             className={`flex-1 px-4 py-2 rounded-lg
-                                                    ${!text || isSent
+        ${!text || buttonState === 'sending' || buttonState === 'sent'
                                                     ? "bg-gray-500 cursor-not-allowed"
                                                     : "bg-[#61DECA] hover:bg-teal-500"} 
-                                                    text-white`}
+        text-white`}
                                         >
-                                            <Send className="inline-block mr-2" />Enviar
+                                            {buttonState === 'send' ? (
+                                                <><Send className="inline-block mr-2" />Enviar</>
+                                            ) : buttonState === 'sending' ? (
+                                                <>Enviando...</>
+                                            ) : (
+                                                <><Send className="inline-block mr-2" />Enviado </>
+                                            )}
                                         </button>
                                         <button
                                             onClick={speechToText}

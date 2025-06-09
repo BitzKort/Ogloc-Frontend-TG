@@ -23,18 +23,23 @@ interface UserInfo {
 }
 
 const UserProfile: React.FC<UserProfileProps> = ({ showNavBar }) => {
-  const [userInfo, setUserInfo] = useState<UserInfo>({
-    name: "",
-    username: "",
-    exp: 0,
-    days: 0,
-    ranking: 0,
-  });
+const [userInfo, setUserInfo] = useState<UserInfo>({
+  name: "",    // <- Valor por defecto
+  username: "", 
+  exp: 0,
+  days: 0,
+  ranking: 0,
+});
   const [editMode, setEditMode] = useState(false);
-  const [form, setForm] = useState({ name: "", username: "" });
+const [form, setForm] = useState({ 
+  name: "",    
+  username: "" 
+});
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [loading, setLoading] = useState(true);
+  const [successMessage, setSuccessMessage] = useState<string>("");
+
 
   const isValid = useMemo(
     () =>
@@ -63,9 +68,24 @@ const UserProfile: React.FC<UserProfileProps> = ({ showNavBar }) => {
           'http://localhost:8000/userInfo',
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        setUserInfo(data);
-        setForm({ name: data.name, username: data.username });
+        // Actualiza userInfo con los datos del backend
+        setUserInfo({
+          name: data.name || '', // Fallback por si data.name es undefined
+          username: data.username || '',
+          exp: data.exp,
+          days: data.days,
+          ranking: data.ranking
+        });
+        setForm({
+          name: data.name || '',
+          username: data.username || ''
+        });
       } catch (e) {
+
+        if (axios.isAxiosError(e) && e.response?.status === 401) {
+                    localStorage.removeItem('auth');
+                    navigate("auth");
+                }
         console.error(e);
       } finally {
         setLoading(false);
@@ -91,26 +111,34 @@ const UserProfile: React.FC<UserProfileProps> = ({ showNavBar }) => {
 
     setErrorMessage("");
     try {
-      const { data } = await axios.put<UserInfo>(
+      // Hacer la petición PUT
+      const { data } = await axios.put<{ msg: string }>( // Solo esperamos el mensaje
         "http://localhost:8000/updateUser",
         { name: form.name.trim(), username: form.username.trim() },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setUserInfo(data);
-      setForm({ name: data.name, username: data.username });
+
+      // Actualizar userInfo CON LOS VALORES DEL FORM (ya que el backend no los retorna)
+      setUserInfo(prev => ({
+        ...prev,
+        name: form.name.trim(),
+        username: form.username.trim()
+      }));
+
+      // Mostrar mensaje de éxito
+      setSuccessMessage(data.msg);
+      setTimeout(() => setSuccessMessage(""), 3000); // Eliminar mensaje después de 3 segundos
       setEditMode(false);
+
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        if (err.response?.status === 406) {
-          setErrorMessage(err.response.data.detail || "Error al registrar usuario.");
-        } else {
-          setErrorMessage(err.response?.data.detail);
-        }
+        setErrorMessage(err.response?.data.detail || "Error desconocido");
       } else {
-        setErrorMessage("Error de conexión.");
+        setErrorMessage("Error de conexión");
       }
     }
   };
+
 
   return (
     <MainLayout navBar={showNavBar}>
@@ -133,32 +161,37 @@ const UserProfile: React.FC<UserProfileProps> = ({ showNavBar }) => {
               />
             )}
             <div className="flex-1 flex flex-col text-lg sm:text-xl text-white font-semibold gap-1">
-              {editMode ? (
+              {!editMode && (
+                <>
+                  <span>{loading ? <Skeleton width={100} /> : userInfo.name}</span>
+                  <span className="text-gray-300 text-sm sm:text-base">
+                    {loading ? <Skeleton width={100} /> : `@${userInfo.username}`}
+                  </span>
+                </>
+              )}
+
+              {/* Inputs (solo en editMode) */}
+              {editMode && (
                 <>
                   <input
                     type="text"
                     value={form.name}
-                    onChange={e => setForm(prev => ({ ...prev, name: e.target.value }))}
+                    onChange={(e) => setForm(prev => ({ ...prev, name: e.target.value }))}
                     className="bg-white/10 border border-white/50 rounded px-2 py-1 text-white sm:w-50 md:w-70 lg:w-90 placeholder-gray-300"
                   />
                   <input
                     type="text"
                     value={form.username}
-                    onChange={e => setForm(prev => ({ ...prev, username: e.target.value }))}
+                    onChange={(e) => setForm(prev => ({ ...prev, username: e.target.value }))}
                     className="bg-white/10 border border-white/50 rounded px-2 py-1 text-white sm:w-50 md:w-70 lg:w-90 placeholder-gray-300"
                   />
-                  {editMode && errorMessage && (
-                    <span className="text-red-500 text-sm mt-1">
-                      {errorMessage}
-                    </span>
+                  {/* Mensajes de error/éxito */}
+                  {errorMessage && (
+                    <span className="text-red-500 text-sm mt-1">{errorMessage}</span>
                   )}
-                </>
-              ) : (
-                <>
-                  <span>{loading ? <Skeleton width={100} /> : `${userInfo.name}`}</span>
-                  <span className="text-gray-300 text-sm sm:text-base">
-                    {loading ? <Skeleton width={100} /> : `@${userInfo.username}`}
-                  </span>
+                  {successMessage && (
+                    <span className="text-green-500 text-sm mt-1">{successMessage}</span>
+                  )}
                 </>
               )}
               <button
@@ -183,8 +216,8 @@ const UserProfile: React.FC<UserProfileProps> = ({ showNavBar }) => {
                   onClick={handleSave}
                   disabled={!(isChanged && isValid)}
                   className={`mt-2 px-4 py-2 rounded-xl transition ${isChanged && isValid
-                      ? "bg-[#61DECA] text-white hover:bg-teal-500"
-                      : "bg-gray-400 text-gray-200 cursor-not-allowed"
+                    ? "bg-[#61DECA] text-white hover:bg-teal-500"
+                    : "bg-gray-400 text-gray-200 cursor-not-allowed"
                     }`}
                 >
                   Guardar

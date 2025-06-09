@@ -34,11 +34,13 @@ const IncorrectQuestionPage: React.FC<IncorrectQuestionPageProps> = ({ showNavBa
     const [question, setQuestion] = useState<Question | null>(null);
     const [text, setText] = useState<string>("");
     const [loading, setLoading] = useState(true);
+    const [buttonState, setButtonState] = useState<'send' | 'sending' | 'sent'>('send');;   
     const [isSent, setIsSent] = useState(false);
     const [isFetchingNext, setIsFetchingNext] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [modalMessage, setModalMessage] = useState("");
     const [error, setError] = useState<string>("");
+    const [micClickCount, setMicClickCount] = useState(0);
     const navigate = useNavigate();
     const { lessonId } = useParams<{ lessonId: string }>();
     const [compareMsg, setCompareMsg] = useState<string>("");
@@ -80,6 +82,11 @@ const IncorrectQuestionPage: React.FC<IncorrectQuestionPageProps> = ({ showNavBa
                 }
 
             } catch (err: any) {
+
+                if (axios.isAxiosError(error) && error.response?.status === 401) {
+                    localStorage.removeItem('auth');
+                    navigate("auth");
+                }
                 const errorMessage = err.response?.data?.detail ||
                     err.message ||
                     "Error al obtener preguntas";
@@ -105,6 +112,7 @@ const IncorrectQuestionPage: React.FC<IncorrectQuestionPageProps> = ({ showNavBa
         setCompareStatus("");
         setLoading(true);
         setQuestion(null);
+        setButtonState('send');
 
 
         setIsFetchingNext(true);
@@ -142,6 +150,11 @@ const IncorrectQuestionPage: React.FC<IncorrectQuestionPageProps> = ({ showNavBa
             }
 
         } catch (err: any) {
+
+            if (axios.isAxiosError(error) && error.response?.status === 401) {
+                localStorage.removeItem('auth');
+                navigate("auth");
+            }
             const errorMessage = err.response?.data?.detail ||
                 err.message ||
                 "Error al obtener preguntas";
@@ -156,6 +169,7 @@ const IncorrectQuestionPage: React.FC<IncorrectQuestionPageProps> = ({ showNavBa
     };
 
     const speechToText = () => {
+        setMicClickCount(prev => prev + 1);
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         const recognition = new SpeechRecognition();
         recognition.lang = "en-US";
@@ -165,6 +179,7 @@ const IncorrectQuestionPage: React.FC<IncorrectQuestionPageProps> = ({ showNavBa
 
     const sendToCompare = async (answer: string, answerUser: string, lesson_id: string, question_id: string) => {
         setError("");
+        setButtonState('sending');
         try {
 
             const token = localStorage.getItem('auth');
@@ -188,8 +203,10 @@ const IncorrectQuestionPage: React.FC<IncorrectQuestionPageProps> = ({ showNavBa
 
             );
             setCompareMsg(data.msg);
+            setMicClickCount(0)
             setCompareStatus(data.status);
             setIsSent(true);
+            setButtonState('sent'); 
         } catch (err: any) {
             setError(err.response?.data?.message || "Error al comparar respuestas");
         }
@@ -229,7 +246,9 @@ const IncorrectQuestionPage: React.FC<IncorrectQuestionPageProps> = ({ showNavBa
                             <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
                                 <h1 className="text-2xl font-bold text-white">
                                     {loading ? <Skeleton width={200} /> : question?.title}
+                                    <p className="text-sm text-yellow-300">30 exp</p>
                                 </h1>
+
                             </div>
 
 
@@ -237,6 +256,7 @@ const IncorrectQuestionPage: React.FC<IncorrectQuestionPageProps> = ({ showNavBa
 
                                 <div className="md:w-1/2 bg-[#444544]/50 rounded-xl p-6 text-white">
                                     {loading ? <Skeleton count={5} /> : question?.text}
+
                                 </div>
 
 
@@ -251,8 +271,8 @@ const IncorrectQuestionPage: React.FC<IncorrectQuestionPageProps> = ({ showNavBa
                                     {!loading && question && (
                                         <>
                                             <ul className="list-decimal list-inside space-y-2 mb-2">
-                                                <li className="text-green-300">{question.answer}</li>
-                                                <li className="text-yellow-300">{question.distractor}</li>
+                                                <li className="text-sm text-white">{question.answer}</li>
+                                                <li className="text-sm text-white">{question.distractor}</li>
                                             </ul>
 
                                             {compareMsg && (
@@ -265,24 +285,33 @@ const IncorrectQuestionPage: React.FC<IncorrectQuestionPageProps> = ({ showNavBa
                                     )}
                                     <input
                                         type="text"
-                                        className="w-full p-3 mb-4 text-sm rounded border border-white/30"
+                                        className={`w-full p-3 mb-4 text-sm rounded border border-white/30 ${micClickCount < 3
+                                            ? "bg-gray-500"
+                                            : "bg-white/20"
+                                            }`}
                                         placeholder="Dale al microfono para escuchar tu respuesta..."
                                         onChange={handleChange}
                                         value={text}
-                                        readOnly
+                                        readOnly={micClickCount < 3}
                                     />
                                     {error && <p className="text-red-400 mb-4">{error}</p>}
                                     <div className="flex flex-col sm:flex-row sm:justify-between gap-4 mb-4">
                                         <button
                                             onClick={() => sendToCompare(question!.answer, text, question!.lesson_id, question!.question_id)}
-                                            disabled={!text || isSent}
+                                            disabled={!text || buttonState === 'sending' || buttonState === 'sent'}
                                             className={`flex-1 px-4 py-2 rounded-lg
-                                                    ${!text || isSent
+                                               ${!text || buttonState === 'sending' || buttonState === 'sent'
                                                     ? "bg-gray-500 cursor-not-allowed"
                                                     : "bg-[#61DECA] hover:bg-teal-500"} 
-                                                    text-white`}
+                                               text-white`}
                                         >
-                                            <Send className="inline-block mr-2" />Enviar
+                                            {buttonState === 'send' ? (
+                                                <><Send className="inline-block mr-2" />Enviar</>
+                                            ) : buttonState === 'sending' ? (
+                                                <>Enviando...</>
+                                            ) : (
+                                                <><Send className="inline-block mr-2" />Enviado </>
+                                            )}
                                         </button>
                                         <button
                                             onClick={speechToText}
@@ -303,8 +332,8 @@ const IncorrectQuestionPage: React.FC<IncorrectQuestionPageProps> = ({ showNavBa
                                         onClick={handleNextQuestion}
                                         disabled={!isSent || isFetchingNext}
                                         className={`mt-4 px-4 py-2 rounded-lg transition-colors ${!isSent || isFetchingNext
-                                                ? "bg-gray-500 cursor-not-allowed"
-                                                : "bg-[#61DECA] hover:bg-teal-500"
+                                            ? "bg-gray-500 cursor-not-allowed"
+                                            : "bg-[#61DECA] hover:bg-teal-500"
                                             } text-white`}
                                     >
                                         {isFetchingNext ? (

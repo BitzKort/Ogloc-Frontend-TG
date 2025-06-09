@@ -100,10 +100,16 @@ const Home: React.FC<HomeProps> = ({ showNavBar }) => {
         setPlayer(rankingRes.data);
         setLoading(false);
       } catch (error) {
-        setError((error as Error).message);
-
+      // Verificar si es error 401
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        localStorage.removeItem('auth');
+        navigate("auth");
+      } else {
+        // Manejar otros errores
+        setError(error instanceof Error ? error.message : "Ocurrió un error desconocido");
       }
-    };
+    }
+  };
 
     fetchData();
   }, []);
@@ -182,8 +188,8 @@ const Home: React.FC<HomeProps> = ({ showNavBar }) => {
                 lessons.total_pending === 0 ? (
                   <div className="w-full flex items-center justify-center p-6">
                     <p className="text-white text-center">
-                      No hay lecciones por el momento, vuelve en 24 horas <br />
-                      o revisa tu pool de preguntas incorrectas.
+                      No hay lecciones por el momento, mientras tanto <br />
+                       revisa tu pool de preguntas incorrectas.
                     </p>
                   </div>
                 ) : (

@@ -32,7 +32,7 @@ const BadgeCard: React.FC = () => {
                 src={src}
                 alt={`img-${index}`}
                 className="w-18 h-32 object-contain rounded-4xl shadow-sm shadow-gray-600"
-                animate={{ rotateY: [0, 360] }} // Gira en bucle
+                
                 transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: index * 0.8 }}
                 />
             ))}
