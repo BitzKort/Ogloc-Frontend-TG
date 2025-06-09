@@ -1,41 +1,44 @@
 import React, { useState } from "react";
 
-interface AvatarCard {
 
-    avatarImage: string
-    avatarName: string
+interface BadgeCard {
+
+    badgeImage: string
+    badgeName: string
     exp: number
     state: string
 
 }
 
+interface BadgeProps {
 
-interface AvatarProps {
-
-    avatarInfo: AvatarCard
+    badgeInfo: BadgeCard
     onSelect: () => void
 
 
 }
 
 
-
-const Avatar: React.FC<AvatarProps> = ({avatarInfo, onSelect}) => {
+/**
+ * Componente de insignia
+ * @param BadgeProps - Recibe objeto tipo badgeCard y funcion onSelect.
+ */
+const Badge: React.FC<BadgeProps> = ({badgeInfo, onSelect}) => {
 
     return (
 
         <div onClick={onSelect} className="flex flex-col shadow-md hover:shadow-white p-3 m-5 items-center rounded-xl justify-center"> 
 
-            <img className="flex  w-20 h-30 object-contain" src = {avatarInfo.avatarImage}/>
+            <img className="flex  w-20 h-30 object-contain" src = {badgeInfo.badgeImage}/>
 
             <div className="flex flex-col items-center gap-3">
 
-                <span>@{avatarInfo.avatarName}</span>
+                <span>@{badgeInfo.badgeName}</span>
 
                 <div className="flex flex-row justify-between ">
-                    <span>{avatarInfo.state}</span>
+                    <span>{badgeInfo.state}</span>
                     
-                    <span className="flex ml-10 ">{avatarInfo.exp} exp</span>
+                    <span className="flex ml-10 ">{badgeInfo.exp} exp</span>
         
                  </div>
 
@@ -48,4 +51,4 @@ const Avatar: React.FC<AvatarProps> = ({avatarInfo, onSelect}) => {
 
 }
 
-export default Avatar;
+export default Badge;

@@ -9,6 +9,10 @@ interface MainLayoutProps {
     navBar: boolean;
 }
 
+/**
+ * Layout que engloba toda la aplicacion, esta se encarga de siempre tener el footer y la navbar cuando se desee.
+ * @param MainLayoutProps - objeto tipo reactNode para que se muestre la vista o componente.
+*/
 const MainLayout: React.FC<MainLayoutProps> = ({children, navBar}) => {
 
     return (

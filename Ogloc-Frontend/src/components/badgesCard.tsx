@@ -4,6 +4,11 @@ import Elegant from "../assets/zorro ogloc.png"
 import { motion } from "framer-motion"; 
 import { useNavigate } from "react-router-dom";
 
+
+
+/**
+ * Componente de bloque de la insignia, este componente se encarga de redireccionar desde home a la vista de insignias.
+ */
 const BadgeCard: React.FC = () => {
 
     const images = [
@@ -32,7 +37,7 @@ const BadgeCard: React.FC = () => {
                 src={src}
                 alt={`img-${index}`}
                 className="w-18 h-32 object-contain rounded-4xl shadow-sm shadow-gray-600"
-                
+                 animate={{ rotateY: [0, 360] }} // Gira en bucle
                 transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: index * 0.8 }}
                 />
             ))}

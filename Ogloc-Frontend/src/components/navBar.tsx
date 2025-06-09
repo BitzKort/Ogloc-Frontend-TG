@@ -23,7 +23,10 @@ interface UserInfo {
 
 }
 
-
+/**
+ * Componente navBar, es la barra que esta en la parte superior en la mayoria de las vitas
+ * del prototipo.
+ */
 const NavBar: React.FC = () => {
 
     const [userInfo, setUserInfo] = useState<UserInfo>({

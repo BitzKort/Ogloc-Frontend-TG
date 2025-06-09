@@ -4,6 +4,13 @@ import Logo from "../assets/Ogloc logo 2.png"
 
 import { useNavigate } from "react-router-dom";
 
+
+
+
+/**
+ * Componente para el pool de preguntas incorrectas, es el boton que aparece en la pagina principal,
+ * tiene como objetivo navegar hacia la funcion de preguntas incorrectas.
+ */
 const QuestionPool: React.FC = () => {
 
     const navigate = useNavigate();

@@ -8,7 +8,9 @@ interface SpeechTextProps {
 }
 
 
-
+/**
+ * Componente para el correcto funcionamiento del speech to text dentro del prototipo.
+ */
 const SpeechTextButton: React.FC<SpeechTextProps> = ({ setText }) => {
 
 

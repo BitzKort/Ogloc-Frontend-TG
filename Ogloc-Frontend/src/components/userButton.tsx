@@ -24,7 +24,9 @@ interface UserButtonProps{
 
 }
 
-
+/**
+ * Componente que realiza la funcion de boton para que el usuario pueda cerrar cecion o ir al perfil de usuario.
+ */
 const UserButton:React.FC<UserButtonProps> = ({userData, setBadge}) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);

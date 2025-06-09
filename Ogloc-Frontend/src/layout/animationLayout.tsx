@@ -8,7 +8,10 @@ interface AnimationLayoutProps {
     children: React.ReactNode
 }
 
-
+/**
+ * Layout para englobar componentes  que tengan una animacion por defecto utilizando framer motion.
+ * @param AnimationLayoutProps - objeto tipo reactNode para que se muestre el componente animado.
+*/
 const AnimationLayout: React.FC<AnimationLayoutProps> = ({children}) => {
 
     return (

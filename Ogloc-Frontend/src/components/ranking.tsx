@@ -18,6 +18,11 @@ interface RankingProps {
 
 }
 
+
+/**
+ * Componente de ranking, este es el componente que engloba todos los usuarios que se
+ * muestran como lista en la pagina principal.
+ */
 const Ranking: React.FC<RankingProps> = ({players, loading}) => {
 
 

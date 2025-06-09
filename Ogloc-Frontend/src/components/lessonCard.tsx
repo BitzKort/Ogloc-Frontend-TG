@@ -9,6 +9,12 @@ interface LessonCardProps {
 
 }
 
+
+
+/**
+ * Componente de carta de las lecciones, este componente es el encargado
+ * individual de mostrar la informacion general de una leccion a la vez.
+ */
 const LessonCard: React.FC<LessonCardProps> = ({id, title, questions}) => {
 
 

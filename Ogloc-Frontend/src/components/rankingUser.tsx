@@ -16,7 +16,9 @@ interface RankingUserProps {
 }
  
 
-
+/**
+ * Componente de ranking para la carga individual de cada usuario que esta en el ranking.
+ */
 const RankingUser: React.FC<RankingUserProps> = ({index, player}) => {
 
 

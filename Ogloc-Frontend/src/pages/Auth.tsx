@@ -12,6 +12,7 @@ interface AuthProps {
 }
 
 
+
 const Auth: React.FC<AuthProps> = ({ showNavBar }) => {
 
     const [isFlipped, setIsFlipped] = useState(false);

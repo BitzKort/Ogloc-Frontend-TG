@@ -2,6 +2,12 @@ import React from "react";
 import logo from '../assets/rana-Ogloc.svg';
 import { LocateFixed, Mail } from "lucide-react";
 
+
+
+
+/**
+ * Componente del pie de pagina.
+ */
 const Footer: React.FC = () => {
   return (
     <div className="bg-[#61DECA]/60 font-roboto text-white w-full">
@@ -40,10 +46,10 @@ const Footer: React.FC = () => {
         {/* Segunda sección */}
         <div className="flex flex-col-reverse md:flex-row items-center justify-between gap-4">
           <div className="flex flex-wrap justify-center gap-4 md:gap-6">
-            <a href="#" className="hover:text-gray-200 transition-colors">About</a>
-            <a href="#" className="hover:text-gray-200 transition-colors">Contact</a>
-            <a href="#" className="hover:text-gray-200 transition-colors">GitHub</a>
-            <a href="#" className="hover:text-gray-200 transition-colors">LinkedIn</a>
+            <a href="https://github.com/BitzKort/Ogloc-Frontend-TG.git" className="hover:text-gray-200 transition-colors">About</a>
+            <a href="https://www.linkedin.com/in/miguelrivera6387" className="hover:text-gray-200 transition-colors">Contact</a>
+            <a href="https://github.com/BitzKort" className="hover:text-gray-200 transition-colors">GitHub</a>
+            <a href="https://www.linkedin.com/in/miguelrivera6387" className="hover:text-gray-200 transition-colors">LinkedIn</a>
           </div>
           
           <p className="text-sm text-center md:text-right whitespace-nowrap">
