@@ -1,6 +1,5 @@
 import React from "react";
 import Footer from "../components/footer";
-import fondo from '../assets/background login.webp'
 import NavBar from "../components/navBar";
 
 
@@ -10,17 +9,19 @@ interface MainLayoutProps {
     navBar: boolean;
 }
 
+/**
+ * Layout que engloba toda la aplicacion, esta se encarga de siempre tener el footer y la navbar cuando se desee.
+ * @param MainLayoutProps - objeto tipo reactNode para que se muestre la vista o componente.
+*/
 const MainLayout: React.FC<MainLayoutProps> = ({children, navBar}) => {
 
     return (
 
-        //style={{ backgroundImage: `url(${fondo})` }}
-
-        <div className="flex flex-col min-h-screen bg-cover bg-center bg-[#2E2E2E]"  >
+        <div className="flex flex-col min-h-screen bg-[linear-gradient(to_bottom,#aed8dc,#5ba6b8,#2e788f,#1f2a36)]" >
         
         {navBar && <NavBar/>}
 
-        <main className=" flex flex-grow justify-center m-2 sm:m-3 md:m-7 lg:m-11 xl:m-15">
+        <main className=" flex flex-grow justify-center m-2 sm:m-3">
 
             {children}
 

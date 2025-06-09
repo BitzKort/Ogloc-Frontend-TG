@@ -9,6 +9,12 @@ interface LessonCardProps {
 
 }
 
+
+
+/**
+ * Componente de carta de las lecciones, este componente es el encargado
+ * individual de mostrar la informacion general de una leccion a la vez.
+ */
 const LessonCard: React.FC<LessonCardProps> = ({id, title, questions}) => {
 
 
@@ -17,13 +23,13 @@ const LessonCard: React.FC<LessonCardProps> = ({id, title, questions}) => {
 
     return (
 
-        <div className=" flex flex-col bg-white/50 w-60 h-40 items-center justify-between py-6 rounded-lg" onClick={() => {navigate(`/question/${id}`)}}>
+        <div className=" flex flex-col bg-white/50 w-60 h-40 items-center justify-between mx-2 py-6 rounded-lg" onClick={() => {navigate(`/question/${id}`)}}>
 
-                <h1 className="font-semibold text-lg"> {title} </h1>
+                <span className="font-semibold text-center text-lg"> {title} </span>
 
                 <div className="flex flex-row min-w-full pr-4 justify-end">
 
-                    <h2 className="italic"> 1/{questions} </h2>
+                    <span className="italic"> {questions} preguntas</span>
 
                 </div>
                 

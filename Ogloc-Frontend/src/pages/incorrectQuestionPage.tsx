@@ -6,7 +6,7 @@ import axios from "axios";
 import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
-interface QuestionPageProps {
+interface IncorrectQuestionPageProps {
     showNavBar: boolean;
 }
 
@@ -20,9 +20,6 @@ interface Question {
     distractor: string;
 }
 
-interface QuestionsResponse {
-    questions: Question[];
-}
 
 interface Compare {
     status: string;
@@ -32,24 +29,22 @@ interface Compare {
 
 }
 
-const QuestionPage: React.FC<QuestionPageProps> = ({ showNavBar }) => {
+const IncorrectQuestionPage: React.FC<IncorrectQuestionPageProps> = ({ showNavBar }) => {
     const [lesson, setLessons] = useState<Question[]>([]);
     const [question, setQuestion] = useState<Question | null>(null);
     const [text, setText] = useState<string>("");
     const [loading, setLoading] = useState(true);
-    const [buttonState, setButtonState] = useState<'send' | 'sending' | 'sent'>('send');;
+    const [buttonState, setButtonState] = useState<'send' | 'sending' | 'sent'>('send');;   
     const [isSent, setIsSent] = useState(false);
+    const [isFetchingNext, setIsFetchingNext] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [modalMessage, setModalMessage] = useState("");
     const [error, setError] = useState<string>("");
-    const navigate = useNavigate();
     const [micClickCount, setMicClickCount] = useState(0);
+    const navigate = useNavigate();
     const { lessonId } = useParams<{ lessonId: string }>();
-    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [compareMsg, setCompareMsg] = useState<string>("");
     const [compareStatus, setCompareStatus] = useState<string>("");
-    const [showExitConfirmation, setShowExitConfirmation] = useState(false);
-
 
     useEffect(() => {
         const fetchLesson = async () => {
@@ -58,29 +53,47 @@ const QuestionPage: React.FC<QuestionPageProps> = ({ showNavBar }) => {
                 navigate("/auth");
                 return;
             }
+
             try {
-                const { data, status } = await axios.get<QuestionsResponse>(
-                    "http://localhost:8000/lessons",
-                    { headers: { Authorization: `Bearer ${token}` }, params: { lessonId } }
+                const { data } = await axios.get<any>(
+                    "http://localhost:8000/failedQuestions",
+                    { headers: { Authorization: `Bearer ${token}` } }
                 );
-                if (status === 401) {
-                    localStorage.removeItem('auth');
-                    navigate("/auth");
-                    return;
-                }
-                setLessons(data.questions);
-                console.log(data.questions[0])
                 console.log(data)
-                setCurrentQuestionIndex(0);
-                setQuestion(data.questions[0] || null);
+                // Caso 1: Respuesta con preguntas
+                if (data.question_id) {
+                    // Convertimos el objeto individual en un array
+                    setLessons([data]);
+                    setQuestion(data);
+                }
+                // Caso 2: Respuesta sin preguntas
+                else if (data.detail) {
+                    setModalMessage(data.detail);
+                    setShowModal(true);
+                    setLessons([]);
+                    setQuestion(null);
+                }
+                // Caso 3: Respuesta inesperada
+                else {
+                    setModalMessage('Formato de respuesta no reconocido');
+                    setShowModal(true);
+                    setLessons([]);
+                    setQuestion(null);
+                }
 
             } catch (err: any) {
+
                 if (axios.isAxiosError(error) && error.response?.status === 401) {
                     localStorage.removeItem('auth');
                     navigate("auth");
                 }
-                setModalMessage(err.response.data.detail);
+                const errorMessage = err.response?.data?.detail ||
+                    err.message ||
+                    "Error al obtener preguntas";
+                setModalMessage(errorMessage);
                 setShowModal(true);
+                setLessons([]);
+                setQuestion(null);
             } finally {
                 setLoading(false);
             }
@@ -89,15 +102,69 @@ const QuestionPage: React.FC<QuestionPageProps> = ({ showNavBar }) => {
     }, [lessonId, navigate]);
 
 
-    const handleNextQuestion = () => {
-        if (lesson && currentQuestionIndex < lesson.length - 1) {
-            setCurrentQuestionIndex(prev => prev + 1);
-            setQuestion(lesson[currentQuestionIndex + 1]);
-            setIsSent(false);
-            setButtonState('send');
-            setText("");
-            setCompareMsg("");
-            setCompareStatus("");
+    const handleNextQuestion = async () => {
+
+
+        setIsSent(false);
+        setText("");
+        setCompareMsg("");
+        setCompareStatus("");
+        setCompareStatus("");
+        setLoading(true);
+        setQuestion(null);
+        setButtonState('send');
+
+
+        setIsFetchingNext(true);
+
+        const token = localStorage.getItem("auth");
+        if (!token) {
+            navigate("/auth");
+            return;
+        }
+
+        try {
+            const { data } = await axios.get<any>(
+                "http://localhost:8000/failedQuestions",
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            console.log(data)
+            if (data.question_id) {
+
+                setLessons([data]);
+                setQuestion(data);
+            }
+            // Caso 2: Respuesta sin preguntas
+            else if (data.detail) {
+                setModalMessage(data.detail);
+                setShowModal(true);
+                setLessons([]);
+                setQuestion(null);
+            }
+            // Caso 3: Respuesta inesperada
+            else {
+                setModalMessage('Formato de respuesta no reconocido');
+                setShowModal(true);
+                setLessons([]);
+                setQuestion(null);
+            }
+
+        } catch (err: any) {
+
+            if (axios.isAxiosError(error) && error.response?.status === 401) {
+                localStorage.removeItem('auth');
+                navigate("auth");
+            }
+            const errorMessage = err.response?.data?.detail ||
+                err.message ||
+                "Error al obtener preguntas";
+            setModalMessage(errorMessage);
+            setShowModal(true);
+            setLessons([]);
+            setQuestion(null);
+        } finally {
+            setIsFetchingNext(false);
+            setLoading(false);
         }
     };
 
@@ -110,7 +177,7 @@ const QuestionPage: React.FC<QuestionPageProps> = ({ showNavBar }) => {
         recognition.start();
     };
 
-    const sendToCompare = async (answer: string, answerUser: string, question_id: string) => {
+    const sendToCompare = async (answer: string, answerUser: string, lesson_id: string, question_id: string) => {
         setError("");
         setButtonState('sending');
         try {
@@ -120,12 +187,12 @@ const QuestionPage: React.FC<QuestionPageProps> = ({ showNavBar }) => {
             const { data } = await axios.post<Compare>(
                 "http://localhost:8000/compareResponses",
                 {
-                    "lesson_id": lessonId,
+                    "lesson_id": lesson_id,
                     "question_id": question_id,
-                    "newExp": 50,
+                    "newExp": 30,
                     "sentenceNlp": answer,
                     "sentenceUser": answerUser,
-                    "type": 1
+                    "type": 2
                 },
                 {
                     headers: {
@@ -133,18 +200,14 @@ const QuestionPage: React.FC<QuestionPageProps> = ({ showNavBar }) => {
                     }
                 }
 
+
             );
-            console.log(data)
-            setMicClickCount(0)
             setCompareMsg(data.msg);
+            setMicClickCount(0)
             setCompareStatus(data.status);
             setIsSent(true);
-            setButtonState('sent');
+            setButtonState('sent'); 
         } catch (err: any) {
-            if (axios.isAxiosError(error) && error.response?.status === 401) {
-                localStorage.removeItem('auth');
-                navigate("auth");
-            }
             setError(err.response?.data?.message || "Error al comparar respuestas");
         }
     };
@@ -183,16 +246,9 @@ const QuestionPage: React.FC<QuestionPageProps> = ({ showNavBar }) => {
                             <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
                                 <h1 className="text-2xl font-bold text-white">
                                     {loading ? <Skeleton width={200} /> : question?.title}
-                                    <p className="text-sm text-yellow-300">50 exp</p>
+                                    <p className="text-sm text-yellow-300">30 exp</p>
                                 </h1>
 
-                                <span className="text-white text-sm sm:text-base">
-                                    {loading ? (
-                                        <Skeleton width={50} />
-                                    ) : (
-                                        `${currentQuestionIndex + 1}/${lesson.length}`
-                                    )}
-                                </span>
                             </div>
 
 
@@ -200,6 +256,7 @@ const QuestionPage: React.FC<QuestionPageProps> = ({ showNavBar }) => {
 
                                 <div className="md:w-1/2 bg-[#444544]/50 rounded-xl p-6 text-white">
                                     {loading ? <Skeleton count={5} /> : question?.text}
+
                                 </div>
 
 
@@ -240,13 +297,13 @@ const QuestionPage: React.FC<QuestionPageProps> = ({ showNavBar }) => {
                                     {error && <p className="text-red-400 mb-4">{error}</p>}
                                     <div className="flex flex-col sm:flex-row sm:justify-between gap-4 mb-4">
                                         <button
-                                            onClick={() => sendToCompare(question!.answer, text, question!.question_id)}
+                                            onClick={() => sendToCompare(question!.answer, text, question!.lesson_id, question!.question_id)}
                                             disabled={!text || buttonState === 'sending' || buttonState === 'sent'}
                                             className={`flex-1 px-4 py-2 rounded-lg
-        ${!text || buttonState === 'sending' || buttonState === 'sent'
+                                               ${!text || buttonState === 'sending' || buttonState === 'sent'
                                                     ? "bg-gray-500 cursor-not-allowed"
                                                     : "bg-[#61DECA] hover:bg-teal-500"} 
-        text-white`}
+                                               text-white`}
                                         >
                                             {buttonState === 'send' ? (
                                                 <><Send className="inline-block mr-2" />Enviar</>
@@ -265,59 +322,37 @@ const QuestionPage: React.FC<QuestionPageProps> = ({ showNavBar }) => {
                                                     ? "bg-gray-500 cursor-not-allowed"
                                                     : " bg-white/30 hover:text-[#00FFFF50]"}
                                                 
-                                                text-white rounded-full`}
-                                        >
+                                                text-white rounded-full`}                                        >
                                             <Mic className="h-6 w-6" />
                                         </button>
 
                                     </div>
-                                    {lesson && currentQuestionIndex < lesson.length - 1 && (
-                                        <button
-                                            onClick={handleNextQuestion}
-                                            disabled={!isSent}
-                                            className={`mt-4 px-4 py-2 rounded-lg transition-colors ${!isSent
-                                                ? "bg-gray-500 cursor-not-allowed"
-                                                : "bg-[#61DECA] hover:bg-teal-500"
-                                                } text-white`}
-                                        >
-                                            Siguiente
-                                        </button>
-                                    )}
+
+                                    <button
+                                        onClick={handleNextQuestion}
+                                        disabled={!isSent || isFetchingNext}
+                                        className={`mt-4 px-4 py-2 rounded-lg transition-colors ${!isSent || isFetchingNext
+                                            ? "bg-gray-500 cursor-not-allowed"
+                                            : "bg-[#61DECA] hover:bg-teal-500"
+                                            } text-white`}
+                                    >
+                                        {isFetchingNext ? (
+                                            'Buscando...'
+                                        ) : (
+                                            'Siguiente'
+                                        )}
+                                    </button>
 
 
                                 </div>
                             </div>
-
+                            {/* Exit Button */}
                             <button
-                                onClick={() => setShowExitConfirmation(true)}
+                                onClick={() => navigate("/")}
                                 className="mt-8 w-full sm:w-auto px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
                             >
                                 <DoorOpen className="inline-block mr-2" />Salir de la lección
                             </button>
-
-
-                            {showExitConfirmation && (
-                                <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm">
-                                    <div className="bg-white/50 rounded-2xl shadow-xl p-10 max-w-sm">
-                                        <h2 className="text-lg mb-4">Salir de la leccion</h2>
-                                        <p className="mb-6">¿Estás seguro que quieres abandonar la lección? Si ya respondiste al menos una pregunta no podras volver a entrar a la leccion.</p>
-                                        <div className="flex gap-4 justify-end">
-                                            <button
-                                                onClick={() => setShowExitConfirmation(false)}
-                                                className="px-4 py-2 rounded-lg bg-gray-500 text-white hover:bg-gray-600"
-                                            >
-                                                Cancelar
-                                            </button>
-                                            <button
-                                                onClick={() => navigate("/")}
-                                                className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700"
-                                            >
-                                                Salir
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
                         </SkeletonTheme>
                     </div>
                 </div>
@@ -327,4 +362,4 @@ const QuestionPage: React.FC<QuestionPageProps> = ({ showNavBar }) => {
     );
 };
 
-export default QuestionPage;
+export default IncorrectQuestionPage;
