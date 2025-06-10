@@ -122,6 +122,7 @@ const QuestionPage: React.FC<QuestionPageProps> = ({ showNavBar }) => {
                 {
                     "lesson_id": lessonId,
                     "question_id": question_id,
+                    "question_number": currentQuestionIndex,
                     "newExp": 50,
                     "sentenceNlp": answer,
                     "sentenceUser": answerUser,

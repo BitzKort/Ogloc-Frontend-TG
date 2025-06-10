@@ -190,6 +190,7 @@ const IncorrectQuestionPage: React.FC<IncorrectQuestionPageProps> = ({ showNavBa
                     "lesson_id": lesson_id,
                     "question_id": question_id,
                     "newExp": 30,
+                    "question_number": 1,
                     "sentenceNlp": answer,
                     "sentenceUser": answerUser,
                     "type": 2
