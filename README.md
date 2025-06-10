@@ -1,4 +1,4 @@
-**Prototipo Web como Soporte para la Enseñanza de Inglés a través de la Gamificación y Algoritmos de Procesamiento del Lenguaje Natural**
+# Prototipo Web como Soporte para la Enseñanza de Inglés a través de la Gamificación y Algoritmos de Procesamiento del Lenguaje Natural
 
 > Frontend basado en React + Tailwind CSS + TypeScript, generado con Vite.
 
@@ -55,7 +55,7 @@ Este proyecto frontend tiene como objetivo proporcionar una UI para el prototipo
 ---
 **English:**
 
-# Web Prototype as Support for Teaching English through Gamification and Natural Language Processing Algorithms
+# Prototipo Web como Soporte para la Enseñanza de Inglés a través de la Gamificación y Algoritmos de Procesamiento del Lenguaje Natural
 
 > Frontend based on React + Tailwind CSS + TypeScript, generated with Vite.
 
